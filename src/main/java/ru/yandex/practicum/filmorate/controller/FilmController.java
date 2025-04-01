@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -12,20 +14,20 @@ public class FilmController {
     private List<Film> films = new ArrayList<>();
 
     @PostMapping
-    public Film createFilm(@RequestBody Film film) {
+    public ResponseEntity<Film> createFilm(@RequestBody Film film) {
         films.add(film);
-        return film;
+        return ResponseEntity.status(HttpStatus.CREATED).body(film);
     }
 
     @PutMapping("/{id}")
-    public Film updateFilm(@PathVariable Long id, @RequestBody Film film) {
+    public ResponseEntity<Film> updateFilm(@PathVariable Long id, @RequestBody Film film) {
         for (int i = 0; i < films.size(); i++) {
             if (films.get(i).getId().equals(id)) {
                 films.set(i, film);
-                return film;
+                return ResponseEntity.ok(film);
             }
         }
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping

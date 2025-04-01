@@ -15,6 +15,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
+        user.setId(1L); // добавляем идентификатор пользователя
         users.add(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
@@ -24,6 +25,7 @@ public class UserController {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getId().equals(id)) {
                 users.set(i, user);
+                user.setId(id); // добавляем идентификатор пользователя
                 return ResponseEntity.ok(user);
             }
         }

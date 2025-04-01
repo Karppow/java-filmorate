@@ -15,6 +15,7 @@ public class FilmController {
 
     @PostMapping
     public ResponseEntity<Film> createFilm(@RequestBody Film film) {
+        film.setId(1L); // добавляем идентификатор фильма
         films.add(film);
         return ResponseEntity.status(HttpStatus.CREATED).body(film);
     }

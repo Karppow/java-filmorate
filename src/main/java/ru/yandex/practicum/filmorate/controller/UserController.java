@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -12,24 +14,24 @@ public class UserController {
     private List<User> users = new ArrayList<>();
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         users.add(user);
-        return user;
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getId().equals(id)) {
                 users.set(i, user);
-                return user;
+                return ResponseEntity.ok(user);
             }
         }
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return users;
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(users);
     }
 }

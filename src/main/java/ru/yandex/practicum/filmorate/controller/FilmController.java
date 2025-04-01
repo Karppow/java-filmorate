@@ -27,11 +27,11 @@ public class FilmController {
                 return ResponseEntity.ok(film);
             }
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @GetMapping
-    public List<Film> getAllFilms() {
-        return films;
+    public ResponseEntity<List<Film>> getAllFilms() {
+        return ResponseEntity.ok(films);
     }
 }

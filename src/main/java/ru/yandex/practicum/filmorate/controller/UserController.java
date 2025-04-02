@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public class UserController {
             return ResponseEntity.ok(user);
         } else {
             log.warn("User  with ID {} not found. Existing users: {}", user.getId(), users.keySet());
-            return ResponseEntity.notFound().build();
+            throw new UserNotFoundException(user.getId()); // выбрасываем исключение
         }
     }
 

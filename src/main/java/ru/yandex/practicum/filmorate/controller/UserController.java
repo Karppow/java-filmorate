@@ -28,9 +28,8 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> updateUser (@Valid @RequestBody User user) {
         logger.info("Updating user: {}", user);
-
         long id = user.getId(); // Получаем ID из объекта пользователя
 
         if (users.containsKey(id)) {
@@ -38,7 +37,7 @@ public class UserController {
             logger.info("User  with ID {} updated successfully", id);
             return ResponseEntity.ok(user); // Возвращаем обновленного пользователя
         } else {
-            logger.warn("User  with ID {} not found", id);
+            logger.warn("User  with ID {} not found. Existing users: {}", id, users.keySet());
             return ResponseEntity.notFound().build(); // Возвращаем 404 без тела
         }
     }

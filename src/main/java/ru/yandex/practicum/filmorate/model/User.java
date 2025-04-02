@@ -14,10 +14,10 @@ public class User {
     @Email
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Логин не может быть пустым")
     private String login;
 
-    @NotBlank
+    @NotBlank(message = "Имя не может быть пустым")
     private String name;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

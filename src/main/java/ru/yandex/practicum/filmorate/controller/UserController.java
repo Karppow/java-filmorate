@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,16 +17,10 @@ import java.util.Map;
 public class UserController {
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final Map<Long, User> users = new HashMap<>();
-    private final UserValidator userValidator;
-
-    public UserController(UserValidator userValidator) {
-        this.userValidator = userValidator;
-    }
 
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         logger.info("Creating user: {}", user);
-        userValidator.validate(user);
         long id = users.size() + 1;
         user.setId(id);
         users.put(id, user);
@@ -37,7 +30,6 @@ public class UserController {
     @PutMapping
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         logger.info("Updating user: {}", user);
-        userValidator.validate(user);
 
         long id = user.getId(); // Получаем ID из объекта пользователя
 

@@ -38,7 +38,7 @@ public class UserController {
             return ResponseEntity.ok(user);
         } else {
             log.warn("User  with ID {} not found. Existing users: {}", user.getId(), users.keySet());
-            throw new UserNotFoundException(user.getId()); // выбрасываем исключение
+            throw new UserNotFoundException(user.getId());
         }
     }
 

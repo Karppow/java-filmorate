@@ -34,22 +34,22 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
-        logger.info("Updating user with ID {}: {}", id, user);
+    @PutMapping
+    public ResponseEntity<User> updateUser (@Valid @RequestBody User user) {
+        logger.info("Updating user: {}", user);
         userValidator.validate(user);
 
+        long id = user.getId(); // Получаем ID из объекта пользователя
+
         if (users.containsKey(id)) {
-            user.setId(id); // Убедитесь, что ID сохраняется
             users.put(id, user);
             logger.info("User  with ID {} updated successfully", id);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(user); // Возвращаем обновленного пользователя
         } else {
             logger.warn("User  with ID {} not found", id);
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build(); // Возвращаем 404 без тела
         }
     }
-
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {

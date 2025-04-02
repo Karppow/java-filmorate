@@ -28,10 +28,11 @@ public class FilmController {
         return ResponseEntity.status(HttpStatus.CREATED).body(film);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Film> updateFilm(@PathVariable Long id, @Valid @RequestBody Film film) {
+    @PutMapping
+    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
         logger.info("Updating film: {}", film);
-        if (films.containsKey(id)) {
+        Long id = film.getId(); // Получаем ID из объекта Film
+        if (id != null && films.containsKey(id)) {
             films.put(id, film);
             return ResponseEntity.ok(film);
         } else {

@@ -35,17 +35,21 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
-        logger.info("Updating user: {}", user);
+    public ResponseEntity<User> updateUser (@PathVariable Long id, @Valid @RequestBody User user) {
+        logger.info("Updating user with ID {}: {}", id, user);
         userValidator.validate(user);
-        if (users.containsKey(id)) { // Проверяем существование пользователя
+
+        if (users.containsKey(id)) {
+            user.setId(id); // Убедитесь, что ID сохраняется
             users.put(id, user);
+            logger.info("User  with ID {} updated successfully", id);
             return ResponseEntity.ok(user);
         } else {
-            logger.warn("User with ID {} not found", id);
+            logger.warn("User  with ID {} not found", id);
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {

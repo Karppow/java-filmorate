@@ -7,7 +7,8 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserValidatorTest {
     private UserValidator userValidator;
@@ -21,12 +22,8 @@ public class UserValidatorTest {
     public void testUserValidationEmail() {
         User user = new User();
         user.setEmail("");
-        try {
-            userValidator.validate(user);
-            fail("Ожидается ValidationException");
-        } catch (ValidationException e) {
-            assertEquals("Электронная почта не может быть пустой и должна содержать символ @", e.getMessage());
-        }
+        ValidationException exception = assertThrows(ValidationException.class, () -> userValidator.validate(user));
+        assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exception.getMessage());
     }
 
     @Test
@@ -34,12 +31,8 @@ public class UserValidatorTest {
         User user = new User();
         user.setLogin("");
         user.setEmail("test@example.com"); // добавьте электронную почту
-        try {
-            userValidator.validate(user);
-            fail("Ожидается ValidationException");
-        } catch (ValidationException e) {
-            assertEquals("Логин не может быть пустым и содержать пробелы", e.getMessage());
-        }
+        ValidationException exception = assertThrows(ValidationException.class, () -> userValidator.validate(user));
+        assertEquals("Логин не может быть пустым и содержать пробелы", exception.getMessage());
     }
 
     @Test
@@ -48,11 +41,7 @@ public class UserValidatorTest {
         user.setBirthday(new Date(System.currentTimeMillis() + 86400000)); // завтрашняя дата
         user.setEmail("test@example.com"); // добавьте электронную почту
         user.setLogin("test"); // добавьте логин
-        try {
-            userValidator.validate(user);
-            fail("Ожидается ValidationException");
-        } catch (ValidationException e) {
-            assertEquals("Дата рождения не может быть в будущем", e.getMessage());
-        }
+        ValidationException exception = assertThrows(ValidationException.class, () -> userValidator.validate(user));
+        assertEquals("Дата рождения не может быть в будущем", exception.getMessage());
     }
 }

@@ -8,8 +8,8 @@ import java.util.Objects;
 
 public class FilmValidator {
     public void validate(Film film) {
-        if (Objects.isNull(film.getName()) || film.getName().isEmpty()) {
-            throw new ValidationException("Название фильма Пустыня");
+        if (Objects.isNull(film.getName()) || film.getName().trim().isEmpty()) {
+            throw new ValidationException("Название фильма не должно быть пустым");
         }
         if (Objects.nonNull(film.getDescription()) && film.getDescription().length() > 200) {
             throw new ValidationException("Максимальная длина описания — 200 символов");

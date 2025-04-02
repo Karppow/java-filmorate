@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FilmValidatorTest {
 
@@ -20,11 +21,7 @@ public class FilmValidatorTest {
     public void testFilmValidation_NameIsEmpty() {
         Film film = new Film();
         film.setName("");
-        try {
-            filmValidator.validate(film);
-            fail("Ожидается ValidationException");
-        } catch (ValidationException e) {
-            assertEquals("Название фильма Пустыня", e.getMessage());
-        }
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmValidator.validate(film));
+        assertEquals("Название фильма не должно быть пустым", exception.getMessage());
     }
 }

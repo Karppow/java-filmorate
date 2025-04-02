@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,39 +11,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final Map<Long, User> users = new HashMap<>();
 
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        logger.info("Creating user: {}", user);
+    public User createUser (@Valid @RequestBody User user) {
+        log.info("Creating user: {}", user);
+        valid(user);
         long id = users.size() + 1;
         user.setId(id);
         users.put(id, user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        return user;
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
-        logger.info("Updating user: {}", user);
-        long id = user.getId(); // Получаем ID из объекта пользователя
+    public ResponseEntity<User> updateUser (@Valid @RequestBody User user) {
+        log.info("Updating user with ID: {}", user.getId());
 
-        if (users.containsKey(id)) {
-            users.put(id, user);
-            logger.info("User  with ID {} updated successfully", id);
-            return ResponseEntity.ok(user); // Возвращаем обновленного пользователя
+        if (users.containsKey(user.getId())) {
+            valid(user);
+            users.put(user.getId(), user);
+            log.info("User  with ID {} updated successfully", user.getId());
+            return ResponseEntity.ok(user);
         } else {
-            logger.warn("User  with ID {} not found. Existing users: {}", id, users.keySet());
-            return ResponseEntity.notFound().build(); // Возвращаем 404 без тела
+            log.warn("User  with ID {} not found. Existing users: {}", user.getId(), users.keySet());
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        logger.info("Getting all users");
+        log.info("Getting all users");
         return ResponseEntity.ok(List.copyOf(users.values()));
+    }
+
+    private void valid(User user) {
+        if (user.getName() == null) {
+            user.setName(user.getLogin()); // Устанавливаем имя равным логину, если имя отсутствует
+            log.info("Name was empty, setting name to login: {}", user.getLogin());
+        }
     }
 }

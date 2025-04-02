@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Component
 public class UserValidator {
@@ -17,15 +17,14 @@ public class UserValidator {
             throw new ValidationException("Логин не может быть пустым и содержать пробелы");
         }
 
+        // Если имя пустое, используем логин как имя
         if (user.getName() == null || user.getName().isEmpty()) {
-            throw new ValidationException("Имя не может быть пустым");
+            user.setName(user.getLogin());
         }
 
-        if (user.getBirthday() != null && user.getBirthday().after(new Date())) {
+        // Проверка даты рождения
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
     }
 }
-
-
-

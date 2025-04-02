@@ -1,3 +1,5 @@
+package ru.yandex.practicum.filmorate.controller;
+
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,7 @@ public class UserController {
     public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
         logger.info("Updating user: {}", user);
         userValidator.validate(user);
-        if (users.containsKey(id)) {
+        if (users.containsKey(id)) { // Проверяем существование пользователя
             users.put(id, user);
             return ResponseEntity.ok(user);
         } else {

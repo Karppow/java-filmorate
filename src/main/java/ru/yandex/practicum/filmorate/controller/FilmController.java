@@ -24,7 +24,7 @@ public class FilmController {
         logger.info("Creating film: {}", film);
         long id = films.size() + 1;
         film.setId(id);
-        films.put(id, film);
+        films.put(id, film); // Добавляем фильм в карту
         return ResponseEntity.status(HttpStatus.CREATED).body(film);
     }
 

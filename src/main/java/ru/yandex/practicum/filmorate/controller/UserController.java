@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser (@Valid @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         logger.info("Updating user: {}", user);
         long id = user.getId(); // Получаем ID из объекта пользователя
 

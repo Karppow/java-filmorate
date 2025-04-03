@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +18,11 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
-    private final LocalDate targetDate = LocalDate.of(1895, 12, 28);
+    private final FilmValidator filmValidator = new FilmValidator();
 
     @PostMapping
     public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) {
-        valid(film);
+        filmValidator.validate(film);
         log.info("Creating film: {}", film);
         long id = films.size() + 1;
         film.setId(id);
@@ -32,7 +32,7 @@ public class FilmController {
 
     @PutMapping
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
-        valid(film);
+        filmValidator.validate(film);
         log.info("Updating film: {}", film);
 
         if (films.containsKey(film.getId())) {
@@ -49,11 +49,5 @@ public class FilmController {
     public ResponseEntity<List<Film>> getAllFilms() {
         log.info("Getting all films");
         return ResponseEntity.ok(List.copyOf(films.values()));
-    }
-
-    private void valid(Film film) {
-        if (film.getReleaseDate().isBefore(targetDate)) {
-            throw new ru.yandex.practicum.filmorate.Exception.ValidationException("Дата выхода фильма не может быть раньше 1895 года");
-        }
     }
 }

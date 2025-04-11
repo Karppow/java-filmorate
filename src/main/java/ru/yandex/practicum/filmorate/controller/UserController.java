@@ -24,30 +24,30 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser (@Valid @RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.info("Creating user: {}", user);
-        User createdUser  = userService.addUser (user);
-        log.info("User  created with ID: {}", createdUser .getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser );
+        User createdUser = userService.addUser (user);
+        log.info("User created with ID: {}", createdUser.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser (@Valid @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         log.info("Updating user with ID: {}", user.getId());
-        User updatedUser  = userService.updateUser (user);
-        log.info("User  updated: {}", updatedUser );
-        return ResponseEntity.ok(updatedUser );
+        User updatedUser = userService.updateUser(user);
+        log.info("User updated: {}", updatedUser);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser (@PathVariable Long id) {
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
         log.info("Getting user with ID {}", id);
-        User user = userService.getUser (id);
+        User user = userService.getUser(id);
         if (user == null) {
             log.warn("User  with ID {} not found", id);
             throw new UserNotFoundException(id);
         }
-        log.info("User  found: {}", user);
+        log.info("User found: {}", user);
         return ResponseEntity.ok(user);
     }
 

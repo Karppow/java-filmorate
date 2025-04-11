@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.validator;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Component
 public class FilmValidator {
     public void validate(Film film) {
         if (Objects.isNull(film.getName()) || film.getName().trim().isEmpty()) {

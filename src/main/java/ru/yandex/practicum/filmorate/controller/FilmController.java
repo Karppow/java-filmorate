@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.LikeRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -96,29 +97,4 @@ public class FilmController {
         log.info("Found {} popular films", popularFilms.size());
         return ResponseEntity.ok(popularFilms);
     }
-    public static class LikeRequest {
-        private Long filmId;
-        private Long userId;
-
-        // Геттер для filmId
-        public Long getFilmId() {
-            return filmId;
-        }
-
-        // Сеттер для filmId
-        public void setFilmId(Long filmId) {
-            this.filmId = filmId;
-        }
-
-        // Геттер для userId
-        public Long getUserId() {
-            return userId;
-        }
-
-        // Сеттер для userId
-        public void setUserId(Long userId) {
-            this.userId = userId;
-        }
-    }
-
 }

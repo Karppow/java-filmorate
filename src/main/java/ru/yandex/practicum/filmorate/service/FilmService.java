@@ -20,10 +20,17 @@ public class FilmService {
         return filmStorage.addFilm(film);
     }
 
+    public Film updateFilm(Film film) {
+        return filmStorage.updateFilm(film);
+    }
+
+    public void deleteFilm(Long id) {
+        filmStorage.deleteFilm(id);
+    }
+
     public Film getFilm(Long id) {
         return filmStorage.getFilm(id);
     }
-
 
     public void addLike(Long filmId, Long userId) {
         Film film = filmStorage.getFilm(filmId);

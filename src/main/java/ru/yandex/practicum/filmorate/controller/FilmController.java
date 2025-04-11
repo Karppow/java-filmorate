@@ -42,6 +42,23 @@ public class FilmController {
         return ResponseEntity.ok(film);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Film> updateFilm(@PathVariable Long id, @RequestBody Film film) {
+        film.setId(id);
+        log.info("Updating film with ID {}", id);
+        Film updatedFilm = filmService.updateFilm(film);
+        log.info("Film updated: {}", updatedFilm);
+        return ResponseEntity.ok(updatedFilm);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
+        log.info("Deleting film with ID {}", id);
+        filmService.deleteFilm(id);
+        log.info("Film with ID {} deleted", id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public ResponseEntity<Void> addLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("User  with ID {} liked film with ID {}", userId, id);

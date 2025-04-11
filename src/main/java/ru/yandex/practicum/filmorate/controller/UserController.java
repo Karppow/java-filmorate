@@ -8,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.FriendRequest;
+import ru.yandex.practicum.filmorate.model.CommonFriendsRequest;
+import ru.yandex.practicum.filmorate.model.UserRequest;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Set;
@@ -24,51 +27,58 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> createUser (@Valid @RequestBody User user) {
         log.info("Creating user: {}", user);
-        User createdUser = userService.addUser(user);
-        log.info("User created with ID: {}", createdUser.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        User createdUser  = userService.addUser (user);
+        log.info("User  created with ID: {}", createdUser .getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser );
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> updateUser (@Valid @RequestBody User user) {
         log.info("Updating user with ID: {}", user.getId());
-        User updatedUser = userService.updateUser(user);
-        log.info("User updated: {}", updatedUser);
-        return ResponseEntity.ok(updatedUser);
+        User updatedUser  = userService.updateUser (user);
+        log.info("User  updated: {}", updatedUser );
+        return ResponseEntity.ok(updatedUser );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
+    @GetMapping
+    public ResponseEntity<User> getUser (@RequestBody UserRequest userRequest) {
+        Long id = userRequest.getId();
         log.info("Getting user with ID {}", id);
-        User user = userService.getUser(id);
+        User user = userService.getUser (id);
         if (user == null) {
             log.warn("User  with ID {} not found", id);
             throw new UserNotFoundException(id);
         }
-        log.info("User found: {}", user);
+        log.info("User  found: {}", user);
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<Void> addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+    @PutMapping("/friends")
+    public ResponseEntity<Void> addFriend(@RequestBody FriendRequest friendRequest) {
+        Long userId = friendRequest.getUserId();
+        Long friendId = friendRequest.getFriendId();
         log.info("Adding friend with ID {} to user with ID {}", friendId, userId);
         userService.addFriend(userId, friendId);
         log.info("Friend with ID {} added to user with ID {}", friendId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @DeleteMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<Void> removeFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+    @DeleteMapping("/friends")
+    public ResponseEntity<Void> removeFriend(@RequestBody FriendRequest friendRequest) {
+        Long userId = friendRequest.getUserId();
+        Long friendId = friendRequest.getFriendId();
         log.info("Removing friend with ID {} from user with ID {}", friendId, userId);
         userService.removeFriend(userId, friendId);
         log.info("Friend with ID {} removed from user with ID {}", friendId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<Set<Long>> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
+    @GetMapping("/friends/common")
+    public ResponseEntity<Set<Long>> getCommonFriends(@RequestBody CommonFriendsRequest commonFriendsRequest) {
+        Long id = commonFriendsRequest.getId();
+        Long otherId = commonFriendsRequest.getOtherId();
         log.info("Getting common friends between user with ID {} and user with ID {}", id, otherId);
         Set<Long> commonFriends = userService.getCommonFriends(id, otherId);
         log.info("Common friends found: {}", commonFriends);

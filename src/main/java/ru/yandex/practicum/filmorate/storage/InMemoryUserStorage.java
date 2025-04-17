@@ -14,20 +14,20 @@ public class InMemoryUserStorage implements UserStorage {
     private long currentId = 1;
 
     @Override
-    public User addUser (User user) {
+    public User addUser(User user) {
         user.setId(currentId++);
         users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User updateUser (User user) {
+    public User updateUser(User user) {
         users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User getUser (long id) {
+    public User getUser(long id) {
         return users.get(id);
     }
 

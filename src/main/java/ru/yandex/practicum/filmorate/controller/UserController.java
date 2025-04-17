@@ -94,12 +94,4 @@ public class UserController {
         log.info("Common friends found: {}", commonFriends);
         return ResponseEntity.ok(commonFriends);
     }
-
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        log.info("Getting all users");
-        List<User> users = userService.getAllUsers();
-        log.info("Total users found: {}", users.size());
-        return ResponseEntity.ok(users);
-    }
 }

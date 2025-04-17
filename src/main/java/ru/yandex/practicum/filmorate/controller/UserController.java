@@ -72,11 +72,32 @@ public class UserController {
 
     @PutMapping("/{userId}/friends/{friendId}")
     public ResponseEntity<Void> addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
-        log.info("Adding friend with ID {} to user with ID {}", friendId, userId);
+        log.info("Attempting to add friend with ID {} to user with ID {}", friendId, userId);
+
+        // Проверяем, что текущий пользователь не пытается добавить себя в друзья
+        if (userId.equals(friendId)) {
+            log.warn("User cannot add themselves as a friend. User ID: {}", userId);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // 400 Bad Request
+        }
+
+        // Проверяем существование пользователей
+        if (!userService.existsById(userId)) {
+            log.warn("User with ID {} not found", userId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
+        }
+
+        if (!userService.existsById(friendId)) {
+            log.warn("Friend with ID {} not found", friendId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
+        }
+
+        // Добавление друга
         userService.addFriend(userId, friendId);
-        log.info("Friend with ID {} added to user with ID {}", friendId, userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        log.info("Friend with ID {} successfully added to user with ID {}", friendId, userId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 204 No Content
     }
+
 
     @DeleteMapping("/friends")
     public ResponseEntity<Void> removeFriend(@RequestBody FriendRequest friendRequest) {

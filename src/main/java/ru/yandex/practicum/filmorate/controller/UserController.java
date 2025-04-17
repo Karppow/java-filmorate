@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.FriendRequest;
@@ -37,8 +38,15 @@ public class UserController {
     @PutMapping
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         log.info("Updating user with ID: {}", user.getId());
-        User updatedUser  = userService.updateUser(user);
-        log.info("User  updated: {}", updatedUser);
+
+        User updatedUser = userService.updateUser(user);
+
+        // Проверяем, был ли пользователь найден
+        if (updatedUser == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        log.info("User updated: {}", updatedUser);
         return ResponseEntity.ok(updatedUser);
     }
 

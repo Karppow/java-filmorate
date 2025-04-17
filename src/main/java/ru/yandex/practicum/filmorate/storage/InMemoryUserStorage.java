@@ -3,14 +3,12 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
+    private final Map<Long, Set<Long>> friendsMap = new HashMap<>();
     private long currentId = 1;
 
     @Override
@@ -36,6 +34,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getUsers() {
-        return new ArrayList<>(users.values()); // Возвращаем список всех пользователей
+        return new ArrayList<>(users.values());
     }
 }

@@ -68,4 +68,21 @@ public class UserService {
         }
         return new HashSet<>();
     }
+
+    public Set<User> getFriends(Long userId) {
+        User user = userStorage.getUser(userId);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        Set<Long> friendIds = user.getFriends();
+        Set<User> friends = new HashSet<>();
+
+        for (Long friendId : friendIds) {
+            User friend = userStorage.getUser(friendId);
+            if (friend != null) {
+                friends.add(friend);
+            }
+        }
+        return friends;
+    }
 }

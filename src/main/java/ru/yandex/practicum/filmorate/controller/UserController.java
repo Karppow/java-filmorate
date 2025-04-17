@@ -88,6 +88,18 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @GetMapping("/{id}/friends")
+    public ResponseEntity<Set<User>> getFriends(@PathVariable Long id) {
+        log.info("Getting friends for user with ID {}", id);
+        Set<User> friends = userService.getFriends(id);
+        if (friends.isEmpty()) {
+            log.warn("No friends found for user with ID {}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        log.info("Friends found for user with ID {}: {}", id, friends);
+        return ResponseEntity.ok(friends);
+    }
+
     @GetMapping("/friends/common")
     public ResponseEntity<Set<Long>> getCommonFriends(@RequestBody CommonFriendsRequest commonFriendsRequest) {
         Long id = commonFriendsRequest.getId();

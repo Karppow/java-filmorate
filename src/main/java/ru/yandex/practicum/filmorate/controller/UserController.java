@@ -109,7 +109,6 @@ public class UserController {
         return ResponseEntity.ok(friends);
     }
 
-
     @GetMapping("/friends/common")
     public ResponseEntity<Set<Long>> getCommonFriends(@RequestBody CommonFriendsRequest commonFriendsRequest) {
         Long id = commonFriendsRequest.getId();

@@ -8,7 +8,6 @@ import java.util.*;
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
-    private final Map<Long, Set<Long>> friendsMap = new HashMap<>();
     private long currentId = 1;
 
     @Override

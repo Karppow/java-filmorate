@@ -70,10 +70,8 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @PutMapping("/friends")
-    public ResponseEntity<Void> addFriend(@RequestBody FriendRequest friendRequest) {
-        Long userId = friendRequest.getUserId();
-        Long friendId = friendRequest.getFriendId();
+    @PutMapping("/{userId}/friends/{friendId}")
+    public ResponseEntity<Void> addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
         log.info("Adding friend with ID {} to user with ID {}", friendId, userId);
         userService.addFriend(userId, friendId);
         log.info("Friend with ID {} added to user with ID {}", friendId, userId);

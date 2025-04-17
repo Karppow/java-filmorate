@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.CommonFriendsRequest;
 import ru.yandex.practicum.filmorate.model.UserRequest;
 import ru.yandex.practicum.filmorate.service.UserService;
 
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -34,6 +35,7 @@ public class UserController {
         log.info("User  created with ID: {}", createdUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
+
 
     @PutMapping
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
@@ -91,5 +93,13 @@ public class UserController {
         Set<Long> commonFriends = userService.getCommonFriends(id, otherId);
         log.info("Common friends found: {}", commonFriends);
         return ResponseEntity.ok(commonFriends);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<User>> getAllUsers() {
+        log.info("Getting all users");
+        List<User> users = userService.getAllUsers();
+        log.info("Total users found: {}", users.size());
+        return ResponseEntity.ok(users);
     }
 }

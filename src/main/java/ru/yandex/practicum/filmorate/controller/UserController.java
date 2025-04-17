@@ -95,7 +95,7 @@ public class UserController {
         return ResponseEntity.ok(commonFriends);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         log.info("Getting all users");
         List<User> users = userService.getAllUsers();

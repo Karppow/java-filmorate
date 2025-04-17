@@ -32,6 +32,10 @@ public class UserService {
         return userStorage.getUsers(); // Добавьте этот метод
     }
 
+    public boolean existsById(Long id) {
+        return userStorage.getUser(id) != null; // Проверяем, существует ли пользователь
+    }
+
     public User updateUser(User user) {
         User existingUser = userStorage.getUser(user.getId());
         if (existingUser == null) {

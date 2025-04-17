@@ -91,14 +91,24 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public ResponseEntity<Set<User>> getFriends(@PathVariable Long id) {
         log.info("Getting friends for user with ID {}", id);
+
+        // Проверяем, существует ли пользователь
+        if (!userService.existsById(id)) {
+            log.warn("User with ID {} not found", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Возвращаем 404, если пользователь не найден
+        }
+
         Set<User> friends = userService.getFriends(id);
+
         if (friends.isEmpty()) {
             log.warn("No friends found for user with ID {}", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Возвращаем 404, если друзей нет
         }
+
         log.info("Friends found for user with ID {}: {}", id, friends);
         return ResponseEntity.ok(friends);
     }
+
 
     @GetMapping("/friends/common")
     public ResponseEntity<Set<Long>> getCommonFriends(@RequestBody CommonFriendsRequest commonFriendsRequest) {

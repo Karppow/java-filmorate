@@ -43,10 +43,17 @@ public class UserService {
     public void addFriend(Long userId, Long friendId) {
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
-        if (user != null && friend != null) {
-            user.getFriends().add(friendId);
-            friend.getFriends().add(userId);
+
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + userId + " not found");
         }
+
+        if (friend == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID " + friendId + " not found");
+        }
+
+        user.getFriends().add(friendId);
+        friend.getFriends().add(userId);
     }
 
     public void removeFriend(Long userId, Long friendId) {

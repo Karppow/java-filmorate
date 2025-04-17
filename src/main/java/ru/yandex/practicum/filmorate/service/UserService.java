@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -26,10 +25,6 @@ public class UserService {
 
     public User getUser(Long id) {
         return userStorage.getUser(id);
-    }
-
-    public List<User> getAllUsers() {
-        return userStorage.getAllUsers();
     }
 
     public User updateUser(User user) {

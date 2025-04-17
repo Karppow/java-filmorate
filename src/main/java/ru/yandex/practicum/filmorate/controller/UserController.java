@@ -11,10 +11,8 @@ import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.FriendRequest;
 import ru.yandex.practicum.filmorate.model.CommonFriendsRequest;
-import ru.yandex.practicum.filmorate.model.UserRequest;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -52,16 +50,15 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    @GetMapping
-    public ResponseEntity<User> getUser(@RequestBody UserRequest userRequest) {
-        Long id = userRequest.getId();
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
         log.info("Getting user with ID {}", id);
         User user = userService.getUser(id);
         if (user == null) {
-            log.warn("User  with ID {} not found", id);
+            log.warn("User with ID {} not found", id);
             throw new UserNotFoundException(id);
         }
-        log.info("User  found: {}", user);
+        log.info("User found: {}", user);
         return ResponseEntity.ok(user);
     }
 

@@ -45,8 +45,8 @@ public class UserService {
     }
 
     public void addFriend(Integer userId, Integer friendId) {
-        User user = userStorage.getUser (userId);
-        User friend = userStorage.getUser (friendId);
+        User user = userStorage.getUser(userId);
+        User friend = userStorage.getUser(friendId);
 
         if (user == null || friend == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User  not found");
@@ -56,18 +56,18 @@ public class UserService {
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
 
-        userStorage.updateUser (user);
-        userStorage.updateUser (friend);
+        userStorage.updateUser(user);
+        userStorage.updateUser(friend);
     }
 
     public void removeFriend(Integer userId, Integer friendId) {
-        User user = userStorage.getUser (userId);
-        User friend = userStorage.getUser (friendId);
+        User user = userStorage.getUser(userId);
+        User friend = userStorage.getUser(friendId);
         if (user != null && friend != null) {
             user.getFriends().remove(friendId);
             friend.getFriends().remove(userId);
-            userStorage.updateUser (user);
-            userStorage.updateUser (friend);
+            userStorage.updateUser(user);
+            userStorage.updateUser(friend);
         }
     }
 

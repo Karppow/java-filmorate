@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.Set;
 @Service
 public class UserService {
     private final UserStorage userStorage;
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     public UserService(UserStorage userStorage) {
@@ -87,19 +90,30 @@ public class UserService {
     }
 
     public Set<User> getFriends(Integer userId) {
-        User user = userStorage.getUser(userId);
+        User user = userStorage.getUser (userId);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User  not found");
         }
+
         Set<Integer> friendIds = user.getFriends();
         Set<User> friends = new HashSet<>();
 
+        if (friendIds == null) {
+            log.warn("User  with ID {} has no friends.", userId);
+            return friends; // Возвращаем пустой набор, если друзей нет
+        }
+
         for (Integer friendId : friendIds) {
-            User friend = userStorage.getUser(friendId);
+            User friend = userStorage.getUser (friendId);
             if (friend != null) {
                 friends.add(friend);
+            } else {
+                log.warn("Friend with ID {} not found for user with ID {}", friendId, userId);
             }
         }
+
+        log.info("Found {} friends for user with ID {}", friends.size(), userId);
         return friends;
     }
+
 }

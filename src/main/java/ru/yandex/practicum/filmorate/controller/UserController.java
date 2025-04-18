@@ -71,7 +71,7 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
+    @PostMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addFriend(@PathVariable @Positive Integer id, @PathVariable @Positive Integer friendId) {
         userService.addFriend(id, friendId);

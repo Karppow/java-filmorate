@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -45,19 +44,16 @@ public class UserService {
         return userStorage.updateUser(user);
     }
 
-    public ResponseEntity<String> addFriend(Integer userId, Integer friendId) {
+    public void addFriend(Integer userId, Integer friendId) {
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
 
-        if (user == null || friend == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("User  not found");
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID" + userId + " not found");
         }
 
-        // Проверяем, являются ли они уже друзьями
-        if (user.getFriends().contains(friendId)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Users are already friends");
+        if (friend == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID" + friendId + " not found");
         }
 
         // Добавляем друг друга в друзья
@@ -66,9 +62,6 @@ public class UserService {
 
         userStorage.updateUser(user);
         userStorage.updateUser(friend);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("Friend added successfully");
     }
 
     public void removeFriend(Integer userId, Integer friendId) {

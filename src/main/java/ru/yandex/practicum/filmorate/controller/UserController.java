@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -70,34 +71,11 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @PutMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<Void> addFriend(@PathVariable Integer userId, @PathVariable Integer friendId) {
-        log.info("Attempting to add friend with ID {} to user with ID {}", friendId, userId);
-
-        // Проверяем, что текущий пользователь не пытается добавить себя в друзья
-        if (userId.equals(friendId)) {
-            log.warn("User cannot add themselves as a friend. User ID: {}", userId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // 400 Bad Request
-        }
-
-        // Проверяем существование пользователей
-        if (!userService.existsById(userId)) {
-            log.warn("User with ID {} not found", userId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
-        }
-
-        if (!userService.existsById(friendId)) {
-            log.warn("Friend with ID {} not found", friendId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
-        }
-
-        // Добавление друга
-        userService.addFriend(userId, friendId);
-        log.info("Friend with ID {} successfully added to user with ID {}", friendId, userId);
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 204 No Content
+    @PutMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addFriend(@PathVariable @Positive Integer id, @PathVariable @Positive Integer friendId) {
+        userService.addFriend(id, friendId);
     }
-
 
     @DeleteMapping("/friends")
     public ResponseEntity<Void> removeFriend(@RequestBody FriendRequest friendRequest) {

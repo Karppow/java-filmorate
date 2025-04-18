@@ -87,7 +87,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/{id}/friends")
+    @GetMapping("/{userId}/friends")
     public ResponseEntity<Set<User>> getFriends(@PathVariable @Positive Integer userId) {
         Set<User> friends = userService.getFriends(userId);
         if (friends.isEmpty()) {

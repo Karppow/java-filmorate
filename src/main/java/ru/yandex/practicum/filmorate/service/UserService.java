@@ -90,7 +90,7 @@ public class UserService {
     }
 
     public Set<User> getFriends(Integer userId) {
-        User user = userStorage.getUser (userId);
+        User user = userStorage.getUser(userId);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User  not found");
         }
@@ -104,7 +104,7 @@ public class UserService {
         }
 
         for (Integer friendId : friendIds) {
-            User friend = userStorage.getUser (friendId);
+            User friend = userStorage.getUser(friendId);
             if (friend != null) {
                 friends.add(friend);
             } else {

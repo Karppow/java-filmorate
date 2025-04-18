@@ -13,7 +13,7 @@ import java.util.Set;
 @Data
 public class User {
     private Integer id;
-
+    private String name;
     private Set<Integer> friends = new HashSet<>();
 
     @Email
@@ -22,9 +22,6 @@ public class User {
     @NotBlank(message = "Логин не может быть пустым и не должен содержать пробелы")
     @Pattern(regexp = "^[^\\s]+$", message = "Логин не должен содержать пробелы")
     private String login;
-
-
-    private String name;
 
     @PastOrPresent
     private LocalDate birthday;
@@ -48,4 +45,12 @@ public class User {
     public Set<Integer> getFriends() {
         return friends;
     }
+
+    public void addFriend(Integer friendId) {
+            friends.add(friendId);
+        }
+        public void removeFriend(Integer friendId) {
+            friends.remove(friendId);
+        }
+
 }

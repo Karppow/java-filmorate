@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
@@ -13,6 +15,8 @@ import java.util.Set;
 @Data
 public class User {
     private Long id;
+
+    @JsonManagedReference
     private Set<Long> friends = new HashSet<>();
 
     @Email
@@ -44,6 +48,7 @@ public class User {
         this.name = name;
     }
 
+    @JsonBackReference
     public Set<Long> getFriends() {
         return friends;
     }

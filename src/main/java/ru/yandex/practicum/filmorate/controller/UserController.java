@@ -88,8 +88,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public void getFriends(@PathVariable @Positive Integer userId) {
-        userService.getFriends(userId);
+    public ResponseEntity<Set<User>> getFriends(@PathVariable @Positive Integer userId) {
+        Set<User> friends = userService.getFriends(userId);
+        if (friends.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Возвращаем 204 No Content, если друзей нет
+        }
+        return ResponseEntity.ok(friends); // Возвращаем 200 OK и список друзей
     }
 
     @GetMapping("/friends/common")

@@ -54,8 +54,8 @@ public class UserService {
         }
 
         // Получение пользователей из хранилища
-        User user = userStorage.getUser (userId);
-        User friend = userStorage.getUser (friendId);
+        User user = userStorage.getUser(userId);
+        User friend = userStorage.getUser(friendId);
 
         // Проверка существования пользователей
         if (user == null) {
@@ -76,8 +76,8 @@ public class UserService {
         friend.getFriends().add(userId);
 
         // Обновление пользователей в хранилище
-        userStorage.updateUser (user);
-        userStorage.updateUser (friend);
+        userStorage.updateUser(user);
+        userStorage.updateUser(friend);
     }
 
     public void removeFriend(Integer userId, Integer friendId) {

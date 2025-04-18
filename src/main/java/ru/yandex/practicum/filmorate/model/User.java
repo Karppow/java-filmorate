@@ -14,10 +14,9 @@ import java.util.Set;
 
 @Data
 public class User {
-    private Long id;
+    private Integer id;
 
-    @JsonManagedReference
-    private Set<Long> friends = new HashSet<>();
+    private Set<Integer> friends = new HashSet<>();
 
     @Email
     private String email;
@@ -32,11 +31,11 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -48,8 +47,7 @@ public class User {
         this.name = name;
     }
 
-    @JsonBackReference
-    public Set<Long> getFriends() {
+    public Set<Integer> getFriends() {
         return friends;
     }
 }

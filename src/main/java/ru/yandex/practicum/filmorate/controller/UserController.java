@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
+    public ResponseEntity<User> getUser(@PathVariable Integer id) {
         log.info("Getting user with ID {}", id);
         User user = userService.getUser(id);
         if (user == null) {
@@ -71,7 +71,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<Void> addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+    public ResponseEntity<Void> addFriend(@PathVariable Integer userId, @PathVariable Integer friendId) {
         log.info("Attempting to add friend with ID {} to user with ID {}", friendId, userId);
 
         // Проверяем, что текущий пользователь не пытается добавить себя в друзья
@@ -101,8 +101,8 @@ public class UserController {
 
     @DeleteMapping("/friends")
     public ResponseEntity<Void> removeFriend(@RequestBody FriendRequest friendRequest) {
-        Long userId = friendRequest.getUserId();
-        Long friendId = friendRequest.getFriendId();
+        Integer userId = friendRequest.getUserId();
+        Integer friendId = friendRequest.getFriendId();
         log.info("Removing friend with ID {} from user with ID {}", friendId, userId);
         userService.removeFriend(userId, friendId);
         log.info("Friend with ID {} removed from user with ID {}", friendId, userId);
@@ -110,7 +110,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public ResponseEntity<Set<User>> getFriends(@PathVariable Long id) {
+    public ResponseEntity<Set<User>> getFriends(@PathVariable Integer id) {
         log.info("Getting friends for user with ID {}", id);
 
         // Проверяем, существует ли пользователь
@@ -131,11 +131,11 @@ public class UserController {
     }
 
     @GetMapping("/friends/common")
-    public ResponseEntity<Set<Long>> getCommonFriends(@RequestBody CommonFriendsRequest commonFriendsRequest) {
-        Long id = commonFriendsRequest.getId();
-        Long otherId = commonFriendsRequest.getOtherId();
+    public ResponseEntity<Set<Integer>> getCommonFriends(@RequestBody CommonFriendsRequest commonFriendsRequest) {
+        Integer id = commonFriendsRequest.getId();
+        Integer otherId = commonFriendsRequest.getOtherId();
         log.info("Getting common friends between user with ID {} and user with ID {}", id, otherId);
-        Set<Long> commonFriends = userService.getCommonFriends(id, otherId);
+        Set<Integer> commonFriends = userService.getCommonFriends(id, otherId);
         log.info("Common friends found: {}", commonFriends);
         return ResponseEntity.ok(commonFriends);
     }

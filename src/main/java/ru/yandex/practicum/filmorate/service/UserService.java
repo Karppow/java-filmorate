@@ -24,16 +24,16 @@ public class UserService {
         return userStorage.addUser(user);
     }
 
-    public User getUser(Long id) {
+    public User getUser(Integer id) {
         return userStorage.getUser(id);
     }
 
     public List<User> getUsers() {
-        return userStorage.getUsers(); // Добавьте этот метод
+        return userStorage.getUsers();
     }
 
-    public boolean existsById(Long id) {
-        return userStorage.getUser(id) != null; // Проверяем, существует ли пользователь
+    public boolean existsById(Integer id) {
+        return userStorage.getUser(id) != null;
     }
 
     public User updateUser(User user) {
@@ -44,54 +44,53 @@ public class UserService {
         return userStorage.updateUser(user);
     }
 
-    public void addFriend(Long userId, Long friendId) {
-        User user = userStorage.getUser(userId);
-        User friend = userStorage.getUser(friendId);
+    public void addFriend(Integer userId, Integer friendId) {
+        User user = userStorage.getUser (userId);
+        User friend = userStorage.getUser (friendId);
 
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + userId + " not found");
+        if (user == null || friend == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User  not found");
         }
 
-        if (friend == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID " + friendId + " not found");
-        }
-
+        // Добавляем друг друга в друзья
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
 
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        userStorage.updateUser (user);
+        userStorage.updateUser (friend);
     }
 
-    public void removeFriend(Long userId, Long friendId) {
-        User user = userStorage.getUser(userId);
-        User friend = userStorage.getUser(friendId);
+    public void removeFriend(Integer userId, Integer friendId) {
+        User user = userStorage.getUser (userId);
+        User friend = userStorage.getUser (friendId);
         if (user != null && friend != null) {
             user.getFriends().remove(friendId);
             friend.getFriends().remove(userId);
+            userStorage.updateUser (user);
+            userStorage.updateUser (friend);
         }
     }
 
-    public Set<Long> getCommonFriends(Long userId1, Long userId2) {
+    public Set<Integer> getCommonFriends(Integer userId1, Integer userId2) {
         User user1 = userStorage.getUser(userId1);
         User user2 = userStorage.getUser(userId2);
         if (user1 != null && user2 != null) {
-            Set<Long> commonFriends = new HashSet<>(user1.getFriends());
+            Set<Integer> commonFriends = new HashSet<>(user1.getFriends());
             commonFriends.retainAll(user2.getFriends());
             return commonFriends;
         }
         return new HashSet<>();
     }
 
-    public Set<User> getFriends(Long userId) {
+    public Set<User> getFriends(Integer userId) {
         User user = userStorage.getUser(userId);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        Set<Long> friendIds = user.getFriends();
+        Set<Integer> friendIds = user.getFriends();
         Set<User> friends = new HashSet<>();
 
-        for (Long friendId : friendIds) {
+        for (Integer friendId : friendIds) {
             User friend = userStorage.getUser(friendId);
             if (friend != null) {
                 friends.add(friend);

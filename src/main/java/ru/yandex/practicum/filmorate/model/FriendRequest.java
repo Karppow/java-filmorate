@@ -1,23 +1,23 @@
 package ru.yandex.practicum.filmorate.model;
 
 public class FriendRequest {
-    private Long userId;
-    private Long friendId;
+    private Integer userId;
+    private Integer friendId;
 
     // Геттеры и сеттеры
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public Long getFriendId() {
+    public Integer getFriendId() {
         return friendId;
     }
 
-    public void setFriendId(Long friendId) {
+    public void setFriendId(Integer friendId) {
         this.friendId = friendId;
     }
 }

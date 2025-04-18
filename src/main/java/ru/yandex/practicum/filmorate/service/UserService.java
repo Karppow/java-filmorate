@@ -48,23 +48,36 @@ public class UserService {
     }
 
     public void addFriend(Integer userId, Integer friendId) {
-        User user = userStorage.getUser(userId);
-        User friend = userStorage.getUser(friendId);
+        // Проверка на добавление самого себя в друзья
+        if (userId.equals(friendId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User  cannot add themselves as a friend");
+        }
 
+        // Получение пользователей из хранилища
+        User user = userStorage.getUser (userId);
+        User friend = userStorage.getUser (friendId);
+
+        // Проверка существования пользователей
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID" + userId + " not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User  with ID " + userId + " not found");
         }
 
         if (friend == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID" + friendId + " not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID " + friendId + " not found");
         }
 
-        // Добавляем друг друга в друзья
+        // Проверка, не является ли друг уже другом пользователя
+        if (user.getFriends().contains(friendId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User  with ID " + userId + " is already friends with user with ID " + friendId);
+        }
+
+        // Добавление друга
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
 
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        // Обновление пользователей в хранилище
+        userStorage.updateUser (user);
+        userStorage.updateUser (friend);
     }
 
     public void removeFriend(Integer userId, Integer friendId) {

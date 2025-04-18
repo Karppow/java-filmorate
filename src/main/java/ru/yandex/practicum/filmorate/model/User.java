@@ -49,8 +49,4 @@ public class User {
     public void addFriend(Integer friendId) {
             friends.add(friendId);
         }
-        public void removeFriend(Integer friendId) {
-            friends.remove(friendId);
-        }
-
 }

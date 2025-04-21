@@ -14,7 +14,7 @@ import java.util.Set;
 public class User {
     private Integer id;
     private String name;
-    private Set<Integer> friends = new HashSet<>();
+    private Set<Integer> friends;
 
     @Email
     private String email;
@@ -26,29 +26,22 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    // Конструктор без инициализации friends
+    public User() {
+        // friends инициализируется позже
     }
 
     public Set<Integer> getFriends() {
+        if (friends == null) {
+            friends = new HashSet<>();  // Инициализация только при обращении
+        }
         return friends;
     }
 
     public void addFriend(Integer friendId) {
-        if (!this.friends.contains(friendId)) {
-            this.friends.add(friendId);
+        if (friends == null) {
+            friends = new HashSet<>();
         }
+        this.friends.add(friendId);
     }
 }

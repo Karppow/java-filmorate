@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.Exception.LikeAlreadyExistsException;
 import ru.yandex.practicum.filmorate.Exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;

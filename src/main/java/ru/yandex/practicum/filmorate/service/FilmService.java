@@ -41,8 +41,18 @@ public class FilmService {
         Film film = filmStorage.getFilm(filmId);
         if (film == null) {
             log.error("Фильм с ID {} не найден", filmId);
+            throw new FilmNotFoundException(filmId); // Бросаем исключение, если фильм не найден
         }
-        return film; // Возвращаем null, если фильм не найден
+        return film; // Возвращаем фильм, если он найден
+    }
+
+    public boolean filmExists(Integer filmId) {
+        try {
+            findFilmById(filmId); // Проверяем, существует ли фильм
+            return true; // Если найден, возвращаем true
+        } catch (FilmNotFoundException e) {
+            return false; // Если не найден, возвращаем false
+        }
     }
 
     public void addLike(Integer filmId, Integer userId) {
@@ -70,10 +80,9 @@ public class FilmService {
             film.getLikes().remove(userId); // Удаляем лайк
             return true; // Успешно удалено
         } else {
-            throw new LikeNotFoundException(userId,filmId); // 404 Not Found
+            throw new LikeNotFoundException(userId, filmId); // 404 Not Found
         }
     }
-
 
     public List<Film> getTopFilms(int count) {
         return filmStorage.getAllFilms().stream()
@@ -84,12 +93,6 @@ public class FilmService {
     }
 
     public Film getFilm(Integer id) {
-        Film film = filmStorage.getFilm(id);
-        if (film == null) {
-            log.error("Фильм с ID {} не найден", id);  // Логируем ошибку
-            throw new FilmNotFoundException(id);  // Бросаем исключение, если фильм не найден
-        }
-        return film;
+        return findFilmById(id); // Теперь метод findFilmById выбросит исключение, если фильм не найден
     }
 }
-

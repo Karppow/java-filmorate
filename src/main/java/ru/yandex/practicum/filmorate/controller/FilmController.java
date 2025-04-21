@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.validator.ErrorResponse;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -91,30 +92,26 @@ public class FilmController {
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<Film> addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+    public ResponseEntity<?> addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
         try {
-            // Проверка существования пользователя
             if (!userService.userExists(userId)) {
                 log.error("Ошибка: Пользователь с ID " + userId + " не найден");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404 Not Found
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("error", "Пользователь не найден")); // 404 Not Found
+            }
+
+            if (!filmService.filmExists(filmId)) {
+                log.error("Ошибка: Фильм с ID " + filmId + " не найден");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("error", "Фильм не найден")); // 404 Not Found
             }
 
             filmService.addLike(filmId, userId);
-            Film updatedFilm = filmService.getFilm(filmId); // Получаем обновлённый фильм
+            Film updatedFilm = filmService.getFilm(filmId);
             return ResponseEntity.status(HttpStatus.OK).body(updatedFilm); // 200 OK
-        } catch (FilmNotFoundException e) {
-            log.error("Ошибка: Фильм с ID " + filmId + " не найден", e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404 Not Found
-        } catch (LikeAlreadyExistsException e) {
-            log.warn("Предупреждение: Лайк от пользователя с ID " + userId + " уже существует для фильма с ID " + filmId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // 400 Bad Request
         } catch (RuntimeException e) {
             log.error("Ошибка: " + e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 500 Internal Server Error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "Внутренняя ошибка сервера")); // 500 Internal Server Error
         }
     }
-
-
 
 
     @DeleteMapping("/{filmId}/like/{userId}")

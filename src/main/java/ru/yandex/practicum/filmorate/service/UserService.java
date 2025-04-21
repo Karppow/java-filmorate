@@ -84,13 +84,15 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or friend not found");
         }
 
-        if (user.getFriends().remove(friendId)) {
+        if (user.getFriends().contains(friendId)) {
+            user.removeFriend(friendId);
             log.info("Removed friend with ID {} from user with ID {}", friendId, userId);
         } else {
             log.warn("User with ID {} was not friends with user with ID {}", userId, friendId);
         }
 
-        if (friend.getFriends().remove(userId)) {
+        if (friend.getFriends().contains(userId)) {
+            friend.removeFriend(userId);
             log.info("Removed user with ID {} from friend list of user with ID {}", userId, friendId);
         } else {
             log.warn("User with ID {} was not friends with user with ID {}", friendId, userId);

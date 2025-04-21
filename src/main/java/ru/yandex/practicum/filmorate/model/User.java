@@ -41,6 +41,4 @@ public class User {
     public void removeFriend(Integer friendId) {
         this.friends.remove(friendId);
     }
-
-
 }

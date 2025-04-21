@@ -53,7 +53,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User cannot add themselves as a friend");
         }
 
-        // Получение пользователей из хранилища (псевдокод)
+        // Получение пользователей из хранилища
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
 
@@ -72,12 +72,12 @@ public class UserService {
         }
 
         // Добавление друга
-        user.addFriend(friendId);
-        friend.addFriend(userId);
+        user.addFriend(friendId);  // Добавляем ID друга
+        friend.addFriend(userId);   // Добавляем ID пользователя в друзья друга
 
         // Обновление пользователей в хранилище
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        userStorage.updateUser(user);  // Явное обновление пользователя в хранилище
+        userStorage.updateUser(friend); // Явное обновление друга в хранилище
     }
 
     public void removeFriend(Integer userId, Integer friendId) {

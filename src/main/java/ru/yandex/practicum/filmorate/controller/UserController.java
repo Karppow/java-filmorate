@@ -92,10 +92,10 @@ public class UserController {
         return ResponseEntity.ok(friends); // Возвращаем 200 OK и список друзей
     }
 
-    @GetMapping("/friends/common")
-    public ResponseEntity<Set<Integer>> getCommonFriends(@RequestBody CommonFriendsRequest commonFriendsRequest) {
-        Integer id = commonFriendsRequest.getId();
-        Integer otherId = commonFriendsRequest.getOtherId();
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public ResponseEntity<Set<Integer>> getCommonFriends(
+            @PathVariable Integer id,
+            @PathVariable Integer otherId) {
         log.info("Getting common friends between user with ID {} and user with ID {}", id, otherId);
         Set<Integer> commonFriends = userService.getCommonFriends(id, otherId);
         log.info("Common friends found: {}", commonFriends);

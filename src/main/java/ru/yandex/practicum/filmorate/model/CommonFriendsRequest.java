@@ -4,7 +4,14 @@ public class CommonFriendsRequest {
     private Integer id;
     private Integer otherId;
 
-    // Геттеры и сеттеры
+    public CommonFriendsRequest() {
+    }
+
+    public CommonFriendsRequest(Integer id, Integer otherId) {
+        this.id = id;
+        this.otherId = otherId;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -19,5 +26,13 @@ public class CommonFriendsRequest {
 
     public void setOtherId(Integer otherId) {
         this.otherId = otherId;
+    }
+
+    @Override
+    public String toString() {
+        return "CommonFriendsRequest{" +
+                "id=" + id +
+                ", otherId=" + otherId +
+                '}';
     }
 }

@@ -170,6 +170,6 @@ public class UserService {
     }
 
     public boolean userExists(Integer userId) {
-        return getUser (userId) != null; // Проверка на существование пользователя
+        return getUser(userId) != null; // Проверка на существование пользователя
     }
 }

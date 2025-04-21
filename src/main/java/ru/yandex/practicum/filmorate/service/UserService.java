@@ -58,12 +58,8 @@ public class UserService {
         User friend = userStorage.getUser(friendId);
 
         // Проверка существования пользователей
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + userId + " not found");
-        }
-
-        if (friend == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID " + friendId + " not found");
+        if (user == null || friend == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or friend not found");
         }
 
         // Проверка, не является ли друг уже другом пользователя

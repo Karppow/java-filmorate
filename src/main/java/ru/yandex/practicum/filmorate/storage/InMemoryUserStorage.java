@@ -22,6 +22,8 @@ public class InMemoryUserStorage implements UserStorage {
         if (!users.containsKey(user.getId())) {
             return null;
         }
+
+        // Обновляем пользователя в хранилище
         users.put(user.getId(), user);
         return user;
     }
@@ -38,18 +40,18 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getFriends(Integer userId) {
-        User user = getUser(userId); // Получаем пользователя по ID
+        User user = getUser(userId);
         if (user == null) {
-            return new ArrayList<>(); // Если пользователь не найден, возвращаем пустой список
+            return new ArrayList<>();  // Пользователь не найден
         }
 
-        List<User> friendsList = new ArrayList<>();
+        Set<User> friendsSet = new HashSet<>();
         for (Integer friendId : user.getFriends()) {
             User friend = getUser(friendId);
             if (friend != null) {
-                friendsList.add(friend); // Добавляем друга в список, если он найден
+                friendsSet.add(friend);
             }
         }
-        return friendsList; // Возвращаем список друзей
+        return new ArrayList<>(friendsSet);  // Возвращаем уникальных друзей
     }
 }

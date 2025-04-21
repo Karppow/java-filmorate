@@ -47,6 +47,8 @@ public class User {
     }
 
     public void addFriend(Integer friendId) {
-        this.friends.add(friendId);
+        if (!this.friends.contains(friendId)) {
+            this.friends.add(friendId);
+        }
     }
 }

@@ -77,14 +77,11 @@ public class UserController {
         userService.addFriend(id, friendId);
     }
 
-    @DeleteMapping("/friends")
-    public ResponseEntity<Void> removeFriend(@RequestBody FriendRequest friendRequest) {
-        Integer userId = friendRequest.getUserId();
-        Integer friendId = friendRequest.getFriendId();
-        log.info("Removing friend with ID {} from user with ID {}", friendId, userId);
-        userService.removeFriend(userId, friendId);
-        log.info("Friend with ID {} removed from user with ID {}", friendId, userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    @DeleteMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeFriend(@PathVariable @Positive Integer id, @PathVariable @Positive Integer friendId) {
+        log.info("Removing friend with ID {} from user with ID {}", friendId, id);
+        userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/{userId}/friends")

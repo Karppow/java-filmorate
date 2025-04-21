@@ -38,4 +38,9 @@ public class User {
     public void addFriend(Integer friendId) {
         this.friends.add(friendId); // friends уже инициализирован
     }
+    public void removeFriend(Integer friendId) {
+        this.friends.remove(friendId);
+    }
+
+
 }

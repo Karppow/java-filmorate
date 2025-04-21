@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.service.MinReleaseDate;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ public class Film {
     @Size(max = 1000, message = "Максимальная длина описания - 1000 символов")
     private String description;
 
+    @MinReleaseDate
     @PastOrPresent
     private LocalDate releaseDate;
 

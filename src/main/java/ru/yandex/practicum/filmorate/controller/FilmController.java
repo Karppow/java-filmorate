@@ -28,7 +28,8 @@ public class FilmController {
     @PostMapping
     public ResponseEntity<Film> createFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Если есть ошибки, возвращаем BAD_REQUEST с деталями ошибок
+            StringBuilder errorMessage = new StringBuilder();
+            bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("\n"));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         Film createdFilm = filmService.addFilm(film);

@@ -79,12 +79,25 @@ public class UserService {
     public void removeFriend(Integer userId, Integer friendId) {
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
-        if (user != null && friend != null) {
-            user.getFriends().remove(friendId);
-            friend.getFriends().remove(userId);
-            userStorage.updateUser(user);
-            userStorage.updateUser(friend);
+
+        if (user == null || friend == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or friend not found");
         }
+
+        if (user.getFriends().remove(friendId)) {
+            log.info("Removed friend with ID {} from user with ID {}", friendId, userId);
+        } else {
+            log.warn("User with ID {} was not friends with user with ID {}", userId, friendId);
+        }
+
+        if (friend.getFriends().remove(userId)) {
+            log.info("Removed user with ID {} from friend list of user with ID {}", userId, friendId);
+        } else {
+            log.warn("User with ID {} was not friends with user with ID {}", friendId, userId);
+        }
+
+        userStorage.updateUser(user);
+        userStorage.updateUser(friend);
     }
 
     public Set<Integer> getCommonFriends(Integer userId1, Integer userId2) {

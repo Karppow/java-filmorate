@@ -38,6 +38,18 @@ public class InMemoryUserStorage implements UserStorage {
         return new ArrayList<>(users.values());
     }
 
+    public boolean addFriend(Integer userId, Integer friendId) {
+        User user = getUser(userId);
+        User friend = getUser(friendId);
+
+        if (user == null || friend == null) {
+            return false; // Один из пользователей не найден
+        }
+
+        user.addFriend(friendId); // Метод добавления друга в классе User
+        return true; // Успех
+    }
+
     @Override
     public List<User> getFriends(Integer userId) {
         User user = getUser(userId);

@@ -26,22 +26,16 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    // Конструктор без инициализации friends
+    // Конструктор с инициализацией friends
     public User() {
-        // friends инициализируется позже
+        this.friends = new HashSet<>(); // Инициализация friends сразу
     }
 
     public Set<Integer> getFriends() {
-        if (friends == null) {
-            friends = new HashSet<>();  // Инициализация только при обращении
-        }
-        return friends;
+        return friends; // friends всегда инициализирован
     }
 
     public void addFriend(Integer friendId) {
-        if (friends == null) {
-            friends = new HashSet<>();
-        }
-        this.friends.add(friendId);
+        this.friends.add(friendId); // friends уже инициализирован
     }
 }

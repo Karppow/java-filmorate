@@ -61,12 +61,9 @@ public class FilmController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<Void> addLike(
-            @PathVariable Long filmId,
-            @PathVariable Long userId
-    ) {
-        filmService.addLike(filmId, userId);
+    @PutMapping("/like")
+    public ResponseEntity<Void> addLike(@RequestBody LikeRequest likeRequest) {
+        filmService.addLike(likeRequest.getFilmId(), likeRequest.getUserId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

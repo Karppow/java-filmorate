@@ -26,11 +26,11 @@ public class FilmController {
     }
 
     @PostMapping
-    public ResponseEntity<Film> createFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
+    public ResponseEntity<?> createFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("\n"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage.toString());
         }
         Film createdFilm = filmService.addFilm(film);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);

@@ -47,6 +47,6 @@ public class User {
     }
 
     public void addFriend(Integer friendId) {
-            friends.add(friendId);
-        }
+        this.friends.add(friendId);
+    }
 }

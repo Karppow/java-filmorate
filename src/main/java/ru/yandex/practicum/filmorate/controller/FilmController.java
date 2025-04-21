@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.LikeAlreadyExistsException;
 import ru.yandex.practicum.filmorate.Exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -51,16 +52,8 @@ public class FilmController {
 
     @GetMapping
     public ResponseEntity<List<Film>> getAllFilms() {
-        try {
-            List<Film> films = filmService.getAllFilms();
-            if (films.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Возвращаем статус 204, если фильмы пустые
-            }
-            return ResponseEntity.ok(films);  // Возвращаем фильмы с кодом 200
-        } catch (Exception e) {
-            log.error("Произошла ошибка при получении списка фильмов", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Ошибка 500
-        }
+        List<Film> films = filmService.getAllFilms();
+        return films.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(films);
     }
 
     @PutMapping
@@ -94,23 +87,35 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable Integer id) {
         filmService.deleteFilm(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{filmId}/like/{userId}")
     public ResponseEntity<Film> addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
         try {
+            // Проверка существования пользователя
+            if (!userService.userExists(userId)) {
+                log.error("Ошибка: Пользователь с ID " + userId + " не найден");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404 Not Found
+            }
+
             filmService.addLike(filmId, userId);
             Film updatedFilm = filmService.getFilm(filmId); // Получаем обновлённый фильм
-            return ResponseEntity.status(HttpStatus.OK).body(updatedFilm); // Возвращаем фильм с лайками
+            return ResponseEntity.status(HttpStatus.OK).body(updatedFilm); // 200 OK
         } catch (FilmNotFoundException e) {
             log.error("Ошибка: Фильм с ID " + filmId + " не найден", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404 Not Found
+        } catch (LikeAlreadyExistsException e) {
+            log.warn("Предупреждение: Лайк от пользователя с ID " + userId + " уже существует для фильма с ID " + filmId);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // 400 Bad Request
         } catch (RuntimeException e) {
             log.error("Ошибка: " + e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // 400 Bad Request, если лайк уже существует
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 500 Internal Server Error
         }
     }
+
+
+
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public ResponseEntity<ErrorResponse> removeLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
@@ -128,6 +133,9 @@ public class FilmController {
 
     @GetMapping("/popular")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(required = false, defaultValue = "10") int count) {
+        if (count <= 0) {
+            return ResponseEntity.badRequest().body(null);
+        }
         List<Film> popularFilms = filmService.getTopFilms(count);
         return ResponseEntity.ok(popularFilms);
     }

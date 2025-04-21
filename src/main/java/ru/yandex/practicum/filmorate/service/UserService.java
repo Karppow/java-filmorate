@@ -168,4 +168,8 @@ public class UserService {
         }
         return commonFriends;
     }
+
+    public boolean userExists(Integer userId) {
+        return getUser (userId) != null; // Проверка на существование пользователя
+    }
 }

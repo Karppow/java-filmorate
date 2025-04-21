@@ -61,9 +61,12 @@ public class FilmController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping("/like")
-    public ResponseEntity<Void> addLike(@RequestBody LikeRequest likeRequest) {
-        filmService.addLike(likeRequest.getFilmId(), likeRequest.getUserId());
+    @PutMapping("/{filmId}/like/{userId}")
+    public ResponseEntity<Void> addLike(
+            @PathVariable Long filmId,
+            @PathVariable Long userId
+    ) {
+        filmService.addLike(filmId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -75,6 +78,7 @@ public class FilmController {
         filmService.removeLike(filmId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
 
     @GetMapping("/popular")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(required = false, defaultValue = "10") int count) {

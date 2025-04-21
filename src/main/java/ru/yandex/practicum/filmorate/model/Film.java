@@ -9,8 +9,8 @@ import java.util.Set;
 
 @Data
 public class Film {
-    private Long id;
-    private Set<Long> likes = new HashSet<>();
+    private Integer id;
+    private Set<Integer> likes = new HashSet<>();
 
     @NotNull(message = "Название не может быть пустым")
     private String name;
@@ -24,11 +24,11 @@ public class Film {
     @Min(value = 1, message = "Длительность фильма должна быть больше нуля")
     private int duration;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -40,11 +40,11 @@ public class Film {
         this.name = name;
     }
 
-    public Set<Long> getLikes() {
+    public Set<Integer> getLikes() {
         return likes;
     }
 
-    public void setLikes(Set<Long> likes) {
+    public void setLikes(Set<Integer> likes) {
         this.likes = likes;
     }
 }

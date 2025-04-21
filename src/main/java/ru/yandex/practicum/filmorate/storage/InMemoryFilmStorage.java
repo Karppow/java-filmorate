@@ -11,8 +11,8 @@ import java.util.Map;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Long, Film> films = new HashMap<>();
-    private long currentId = 1;
+    private final Map<Integer, Film> films = new HashMap<>();
+    private Integer currentId = 1;
 
     @Override
     public Film addFilm(Film film) {
@@ -31,12 +31,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(long id) {
+    public void deleteFilm(Integer id) {
         films.remove(id);
     }
 
     @Override
-    public Film getFilm(long id) {
+    public Film getFilm(Integer id) {
         Film film = films.get(id);
         if (film == null) {
             throw new FilmNotFoundException(id);  // Если фильм не найден, выбрасываем исключение

@@ -6,9 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.LikeAlreadyExistsException;
+import ru.yandex.practicum.filmorate.Exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.validator.ErrorResponse;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
@@ -20,11 +23,13 @@ import java.util.List;
 public class FilmController {
     private final FilmService filmService;
     private final FilmValidator filmValidator;
+    private final UserService userService;
 
     @Autowired
-    public FilmController(FilmService filmService, FilmValidator filmValidator) {
+    public FilmController(FilmService filmService, FilmValidator filmValidator, UserService userService) {
         this.filmService = filmService;
         this.filmValidator = filmValidator;
+        this.userService = userService; // Инициализируем userService
     }
 
     @PostMapping
@@ -88,13 +93,13 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFilm(@PathVariable Integer id) {
         filmService.deleteFilm(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<Film> addLike(@PathVariable Long filmId, @PathVariable Long userId) {
+    public ResponseEntity<Film> addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
         try {
             filmService.addLike(filmId, userId);
             Film updatedFilm = filmService.getFilm(filmId); // Получаем обновлённый фильм
@@ -109,10 +114,17 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<Void> removeLike(@PathVariable Long filmId,
-                                           @PathVariable Long userId) {
-        filmService.removeLike(filmId, userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    public ResponseEntity<ErrorResponse> removeLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+        try {
+            filmService.removeLike(filmId, userId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 204 No Content
+        } catch (FilmNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Фильм не найден: " + e.getMessage())); // 404 Not Found
+        } catch (LikeNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Лайк не найден: " + e.getMessage())); // 404 Not Found
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Произошла ошибка: " + e.getMessage())); // 500 Internal Server Error
+        }
     }
 
     @GetMapping("/popular")

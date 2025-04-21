@@ -13,7 +13,7 @@ public class Film {
     private Long id;
     private Set<Long> likes = new HashSet<>();
 
-    @NotBlank(message = "Название не может быть пустым")
+    @NotNull(message = "Название не может быть пустым")
     private String name;
 
     @Size(max = 3000, message = "Максимальная длина описания - 3000 символов")

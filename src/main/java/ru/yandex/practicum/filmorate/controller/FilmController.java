@@ -1,15 +1,16 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.validator.ErrorResponse;
+import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.List;
 
@@ -18,39 +19,72 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
+    private final FilmValidator filmValidator;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, FilmValidator filmValidator) {
         this.filmService = filmService;
+        this.filmValidator = filmValidator;
     }
 
     @PostMapping
-    public ResponseEntity<Film> createFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    public ResponseEntity<?> createFilm(@RequestBody Film film) {
+        try {
+            // Валидируем фильм
+            filmValidator.validate(film);
+
+            // Создаем фильм
+            Film createdFilm = filmService.addFilm(film);
+
+            // Возвращаем созданный фильм с кодом 201
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
+        } catch (ValidationException e) {
+            // Возвращаем 400 Bad Request с ошибкой валидации
+            ErrorResponse errorResponse = new ErrorResponse("Ошибка валидации: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
-        Film createdFilm = filmService.addFilm(film);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
     }
 
-    // Используем @PathVariable для ID фильма
-    @GetMapping("/{id}")
-    public ResponseEntity<Film> getFilm(@PathVariable Long id) {
-        Film foundFilm = filmService.getFilm(id);
-        if (foundFilm == null) {
-            throw new FilmNotFoundException(id);
+    @GetMapping
+    public ResponseEntity<List<Film>> getAllFilms() {
+        try {
+            List<Film> films = filmService.getAllFilms();
+            if (films.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Возвращаем статус 204, если фильмы пустые
+            }
+            return ResponseEntity.ok(films);  // Возвращаем фильмы с кодом 200
+        } catch (Exception e) {
+            log.error("Произошла ошибка при получении списка фильмов", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Ошибка 500
         }
-        return ResponseEntity.ok(foundFilm);
     }
 
     @PutMapping
-    public ResponseEntity<Film> updateFilm(@RequestBody Film film) {
-        if (film.getId() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+    public ResponseEntity<?> updateFilm(@RequestBody Film film) {
+        try {
+            // Логирование для отладки
+            log.info("Запрос на обновление фильма: " + film);
 
-        Film updatedFilm = filmService.updateFilm(film);
-        return updatedFilm != null ? ResponseEntity.ok(updatedFilm) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            // Если ID фильма не указан
+            if (film.getId() == null) {
+                log.error("ID фильма не может быть null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("ID фильма не может быть null"));
+            }
+
+            // Обновляем фильм
+            Film updatedFilm = filmService.updateFilm(film);
+
+            // Возвращаем обновленный фильм
+            return ResponseEntity.ok(updatedFilm);
+        } catch (FilmNotFoundException e) {
+            // Если фильм не найден
+            log.error("Ошибка: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            // Логирование ошибки и возврат ответа 500
+            log.error("Произошла ошибка при обновлении фильма", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Произошла ошибка при обновлении фильма"));
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -79,3 +113,4 @@ public class FilmController {
         return ResponseEntity.ok(popularFilms);
     }
 }
+

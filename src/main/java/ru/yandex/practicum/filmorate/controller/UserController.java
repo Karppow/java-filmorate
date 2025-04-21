@@ -7,11 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -29,8 +30,14 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.info("Creating user: {}", user);
-        User createdUser  = userService.addUser(user);
-        log.info("User  created with ID: {}", createdUser.getId());
+
+        // Проверка на дату рождения (будущая дата)
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("Дата рождения не может быть в будущем");
+        }
+
+        User createdUser = userService.addUser(user);
+        log.info("User created with ID: {}", createdUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
@@ -40,9 +47,9 @@ public class UserController {
 
         User updatedUser = userService.updateUser(user);
 
-        // Проверяем, был ли пользователь найден
+        // Если пользователь не найден, выбрасываем исключение
         if (updatedUser == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            throw new UserNotFoundException(user.getId());
         }
 
         log.info("User updated: {}", updatedUser);
@@ -53,10 +60,12 @@ public class UserController {
     public ResponseEntity<User> getUser(@PathVariable Integer id) {
         log.info("Getting user with ID {}", id);
         User user = userService.getUser(id);
+
         if (user == null) {
             log.warn("User with ID {} not found", id);
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException(id);  // Используем исключение для возврата 404
         }
+
         log.info("User found: {}", user);
         return ResponseEntity.ok(user);
     }
@@ -85,18 +94,15 @@ public class UserController {
     @GetMapping("/{userId}/friends")
     public ResponseEntity<Set<User>> getFriends(@PathVariable @Positive Integer userId) {
         Set<User> friends = userService.getFriends(userId);
-        if (friends.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Возвращаем 204 No Content, если друзей нет
-        }
-        return ResponseEntity.ok(friends); // Возвращаем 200 OK и список друзей
+        return ResponseEntity.ok(friends); // Возвращаем [] вместо null
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<Set<Integer>> getCommonFriends(
+    public ResponseEntity<Set<User>> getCommonFriends(
             @PathVariable Integer id,
             @PathVariable Integer otherId) {
         log.info("Getting common friends between user with ID {} and user with ID {}", id, otherId);
-        Set<Integer> commonFriends = userService.getCommonFriends(id, otherId);
+        Set<User> commonFriends = userService.getCommonFriendsAsUsers(id, otherId);  // Теперь используем новый метод
         log.info("Common friends found: {}", commonFriends);
         return ResponseEntity.ok(commonFriends);
     }

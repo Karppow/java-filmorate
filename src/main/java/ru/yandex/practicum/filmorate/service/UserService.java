@@ -105,28 +105,31 @@ public class UserService {
     public Set<Integer> getCommonFriends(Integer userId1, Integer userId2) {
         User user1 = userStorage.getUser(userId1);
         User user2 = userStorage.getUser(userId2);
+
+        // Проверка на существование пользователей
         if (user1 != null && user2 != null) {
             Set<Integer> commonFriends = new HashSet<>(user1.getFriends());
-            commonFriends.retainAll(user2.getFriends());
+            commonFriends.retainAll(user2.getFriends());  // Получаем пересечение друзей
             return commonFriends;
         }
+
+        // Возвращаем пустой набор, если хотя бы один пользователь не найден
         return new HashSet<>();
     }
 
     public Set<User> getFriends(Integer userId) {
         User user = userStorage.getUser(userId);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User  not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
 
         Set<Integer> friendIds = user.getFriends();
-        Set<User> friends = new HashSet<>();
-
-        if (friendIds == null) {
-            log.warn("User  with ID {} has no friends.", userId);
-            return friends; // Возвращаем пустой набор, если друзей нет
+        if (friendIds == null || friendIds.isEmpty()) {
+            log.warn("User with ID {} has no friends.", userId);
+            return new HashSet<>(); // Возвращаем пустой набор, если друзей нет
         }
 
+        Set<User> friends = new HashSet<>();
         for (Integer friendId : friendIds) {
             User friend = userStorage.getUser(friendId);
             if (friend != null) {
@@ -140,4 +143,19 @@ public class UserService {
         return friends;
     }
 
+    public Set<User> getCommonFriendsAsUsers(Integer userId1, Integer userId2) {
+        // Получаем общие ID друзей
+        Set<Integer> commonFriendIds = getCommonFriends(userId1, userId2);
+
+        Set<User> commonFriends = new HashSet<>();
+
+        // Преобразуем каждый ID друга в объект User
+        for (Integer id : commonFriendIds) {
+            User user = userStorage.getUser(id);  // Получаем объект пользователя по ID
+            if (user != null) {
+                commonFriends.add(user);
+            }
+        }
+        return commonFriends;
+    }
 }

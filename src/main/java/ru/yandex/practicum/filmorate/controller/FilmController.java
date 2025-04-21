@@ -53,7 +53,6 @@ public class FilmController {
         return updatedFilm != null ? ResponseEntity.ok(updatedFilm) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    // Используем @PathVariable для ID фильма при удалении
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
         filmService.deleteFilm(id);
@@ -61,23 +60,18 @@ public class FilmController {
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<Void> addLike(
-            @PathVariable Long filmId,
-            @PathVariable Long userId
-    ) {
+    public ResponseEntity<Void> addLike(@PathVariable Long filmId,
+                                        @PathVariable Long userId) {
         filmService.addLike(filmId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<Void> removeLike(
-            @PathVariable Long filmId,
-            @PathVariable Long userId
-    ) {
+    public ResponseEntity<Void> removeLike(@PathVariable Long filmId,
+                                           @PathVariable Long userId) {
         filmService.removeLike(filmId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
 
     @GetMapping("/popular")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(required = false, defaultValue = "10") int count) {

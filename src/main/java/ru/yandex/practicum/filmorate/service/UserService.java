@@ -50,7 +50,7 @@ public class UserService {
     public void addFriend(Integer userId, Integer friendId) {
         // Проверка на добавление самого себя в друзья
         if (userId.equals(friendId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User cannot add themselves as a friend");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Пользователь не может добавить себя в друзья");
         }
 
         // Получение пользователей из хранилища
@@ -59,18 +59,18 @@ public class UserService {
 
         // Проверка существования пользователей
         if (user == null) {
-            log.error("User with ID {} not found", userId);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + userId + " not found");
+            log.error("Пользователь с ID {} не найден", userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + userId + " не найден");
         }
         if (friend == null) {
-            log.error("Friend with ID {} not found", friendId);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID " + friendId + " not found");
+            log.error("Друг с ID {} не найден", friendId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Друг с ID " + friendId + " не найден");
         }
 
         // Проверка, не является ли друг уже другом пользователя
         if (user.getFriends().contains(friendId)) {
-            log.warn("User with ID {} is already friends with user with ID {}", userId, friendId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with ID " + userId + " is already friends with user with ID " + friendId);
+            log.warn("Пользователь с ID {} уже является другом пользователя с ID {}", userId, friendId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Пользователь с ID " + userId + " уже является другом пользователя с ID " + friendId);
         }
 
         // Добавление друга
@@ -82,7 +82,7 @@ public class UserService {
         userStorage.updateUser(friend); // Явное обновление друга в хранилище
 
         // Логирование успешной операции
-        log.info("Successfully added friend with ID {} to user with ID {}", friendId, userId);
+        log.info("Успешно добавлен друг с ID {} к пользователю с ID {}", friendId, userId);
     }
 
     public void removeFriend(Integer userId, Integer friendId) {
@@ -93,18 +93,19 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or friend not found");
         }
 
+        // Изменяем код ошибки с 400 на 404
+        if (!user.getFriends().contains(friendId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not friends with the given friend");
+        }
+
         if (user.getFriends().contains(friendId)) {
             user.removeFriend(friendId);
             log.info("Removed friend with ID {} from user with ID {}", friendId, userId);
-        } else {
-            log.warn("User with ID {} was not friends with user with ID {}", userId, friendId);
         }
 
         if (friend.getFriends().contains(userId)) {
             friend.removeFriend(userId);
             log.info("Removed user with ID {} from friend list of user with ID {}", userId, friendId);
-        } else {
-            log.warn("User with ID {} was not friends with user with ID {}", friendId, userId);
         }
 
         userStorage.updateUser(user);

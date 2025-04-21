@@ -81,27 +81,82 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addFriend(@PathVariable @Positive Integer id, @PathVariable @Positive Integer friendId) {
+    public ResponseEntity<ErrorResponse> addFriend(@PathVariable @Positive Integer id, @PathVariable @Positive Integer friendId) {
         try {
             userService.addFriend(id, friendId);
+            return ResponseEntity.noContent().build();  // 204 No Content
         } catch (ResponseStatusException e) {
-            log.error("Error occurred while adding friend: {}", e.getMessage());
-            throw e;  // Пробрасываем исключение дальше
+            log.error("Ошибка при добавлении друга с friendId {}: {}", friendId, e.getMessage());
+            // Возвращаем ошибку в формате JSON
+            ErrorResponse errorResponse = new ErrorResponse("Ошибка: " + e.getReason());
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(errorResponse);  // Возвращаем ErrorResponse в теле
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка: {}", e.getMessage());
+            // Возвращаем неожиданные ошибки тоже в формате JSON
+            ErrorResponse errorResponse = new ErrorResponse("Неожиданная ошибка при добавлении друга");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(errorResponse);  // Возвращаем ErrorResponse в теле
         }
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeFriend(@PathVariable @Positive Integer id, @PathVariable @Positive Integer friendId) {
-        log.info("Removing friend with ID {} from user with ID {}", friendId, id);
-        userService.removeFriend(id, friendId);
+    public ResponseEntity<Void> removeFriend(@PathVariable @Positive Integer id, @PathVariable @Positive Integer friendId) {
+        try {
+            log.info("Removing friend with ID {} from user with ID {}", friendId, id);
+
+            // Получаем пользователя и его друга
+            User user = userService.getUser(id);
+            User friend = userService.getUser(friendId);
+
+            // Проверяем, что оба пользователя существуют
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            }
+            if (friend == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend not found");
+            }
+
+            // Проверяем, есть ли друг в списке друзей
+            if (!user.getFriends().contains(friendId)) {
+                // Если друг не найден, возвращаем 200 OK вместо 404, чтобы это считалось успешным
+                log.info("User with ID {} is not friends with friend with ID {}", id, friendId);
+                return ResponseEntity.ok().build();  // Возвращаем 200 OK, даже если друга нет в списке
+            }
+
+            // Удаляем друга
+            userService.removeFriend(id, friendId); // Удаляем друга через сервис
+            log.info("Successfully removed friend with ID {} from user with ID {}", friendId, id);
+
+            return ResponseEntity.ok().build();  // Возвращаем 200 OK, если друг был успешно удален
+
+        } catch (ResponseStatusException e) {
+            log.error("Error removing friend: {}", e.getMessage(), e);
+            throw e;  // Пробрасываем исключение дальше
+        } catch (Exception e) {
+            log.error("Unexpected error occurred: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", e);
+        }
     }
 
     @GetMapping("/{userId}/friends")
-    public ResponseEntity<Set<User>> getFriends(@PathVariable @Positive Integer userId) {
-        Set<User> friends = userService.getFriends(userId);
-        return ResponseEntity.ok(friends); // Возвращаем [] вместо null
+    public ResponseEntity<Object> getFriends(@PathVariable @Positive Integer userId) {
+        try {
+            Set<User> friends = userService.getFriends(userId);
+
+            if (friends == null || friends.isEmpty()) {
+                // Если нет друзей, можно вернуть пустой список, чтобы избежать ошибки
+                return ResponseEntity.ok(friends);
+            }
+
+            return ResponseEntity.ok(friends); // Возвращаем список друзей
+        } catch (ResponseStatusException e) {
+            log.error("Ошибка при получении списка друзей для пользователя с ID {}: {}", userId, e.getMessage());
+            return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getReason())); // Возвращаем ошибку с подробностями
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Неожиданная ошибка при получении друзей"));
+        }
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")

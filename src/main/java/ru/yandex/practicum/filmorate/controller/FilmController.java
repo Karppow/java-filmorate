@@ -94,8 +94,7 @@ public class FilmController {
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<Film> addLike(@PathVariable Long filmId,
-                                        @PathVariable Long userId) {
+    public ResponseEntity<Film> addLike(@PathVariable Long filmId, @PathVariable Long userId) {
         try {
             filmService.addLike(filmId, userId);
             Film updatedFilm = filmService.getFilm(filmId); // Получаем обновлённый фильм
@@ -103,6 +102,9 @@ public class FilmController {
         } catch (FilmNotFoundException e) {
             log.error("Ошибка: Фильм с ID " + filmId + " не найден", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404 Not Found
+        } catch (RuntimeException e) {
+            log.error("Ошибка: " + e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // 400 Bad Request, если лайк уже существует
         }
     }
 

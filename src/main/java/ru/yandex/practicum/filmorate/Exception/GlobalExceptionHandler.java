@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.Exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;  // Исправленный импорт
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -19,10 +20,7 @@ public class GlobalExceptionHandler {
     List<String> errorMessages = e.getBindingResult().getFieldErrors().stream()
             .map(FieldError::getDefaultMessage)
             .collect(Collectors.toList());
-    return new ResponseEntity<>(
-            new ErrorResponse("Ошибки валидации: " + String.join(", ", errorMessages)),
-            HttpStatus.BAD_REQUEST
-    );
+    return new ResponseEntity<>(new ErrorResponse("Ошибки валидации: " + String.join(", ", errorMessages)), HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(ResourceNotFoundException.class)
@@ -43,5 +41,11 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleException(Exception e) {
     return new ResponseEntity<>(new ErrorResponse("Произошла ошибка: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @ExceptionHandler(ResponseStatusException.class)
+  public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException e) {
+    // Возвращаем статус и сообщение ошибки
+    return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
   }
 }

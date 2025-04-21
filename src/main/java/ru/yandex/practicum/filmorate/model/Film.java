@@ -16,7 +16,7 @@ public class Film {
     @NotBlank(message = "Название не может быть пустым")
     private String name;
 
-    @Size(max = 1000, message = "Максимальная длина описания - 1000 символов")
+    @Size(max = 3000, message = "Максимальная длина описания - 3000 символов")
     private String description;
 
     @MinReleaseDate

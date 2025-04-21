@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -25,7 +26,11 @@ public class FilmController {
     }
 
     @PostMapping
-    public ResponseEntity<Film> createFilm(@RequestBody @Valid Film film) {
+    public ResponseEntity<Film> createFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // Если есть ошибки, возвращаем BAD_REQUEST с деталями ошибок
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
         Film createdFilm = filmService.addFilm(film);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
     }
@@ -43,11 +48,11 @@ public class FilmController {
     @PutMapping
     public ResponseEntity<Film> updateFilm(@RequestBody Film film) {
         if (film.getId() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
         Film updatedFilm = filmService.updateFilm(film);
-        return ResponseEntity.ok(updatedFilm);
+        return updatedFilm != null ? ResponseEntity.ok(updatedFilm) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     // Используем @PathVariable для ID фильма при удалении

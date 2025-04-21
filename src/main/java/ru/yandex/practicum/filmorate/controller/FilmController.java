@@ -61,15 +61,21 @@ public class FilmController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping("/like")
-    public ResponseEntity<Void> addLike(@RequestBody LikeRequest likeRequest) {
-        filmService.addLike(likeRequest.getFilmId(), likeRequest.getUserId());
+    @PutMapping("/{filmId}/like/{userId}")
+    public ResponseEntity<Void> addLike(
+            @PathVariable Long filmId,
+            @PathVariable Long userId
+    ) {
+        filmService.addLike(filmId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @DeleteMapping("/like")
-    public ResponseEntity<Void> removeLike(@RequestBody LikeRequest likeRequest) {
-        filmService.removeLike(likeRequest.getFilmId(), likeRequest.getUserId());
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public ResponseEntity<Void> removeLike(
+            @PathVariable Long filmId,
+            @PathVariable Long userId
+    ) {
+        filmService.removeLike(filmId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

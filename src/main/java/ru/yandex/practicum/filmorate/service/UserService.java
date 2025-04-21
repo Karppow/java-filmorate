@@ -58,12 +58,18 @@ public class UserService {
         User friend = userStorage.getUser(friendId);
 
         // Проверка существования пользователей
-        if (user == null || friend == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or friend not found");
+        if (user == null) {
+            log.error("User with ID {} not found", userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + userId + " not found");
+        }
+        if (friend == null) {
+            log.error("Friend with ID {} not found", friendId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend with ID " + friendId + " not found");
         }
 
         // Проверка, не является ли друг уже другом пользователя
         if (user.getFriends().contains(friendId)) {
+            log.warn("User with ID {} is already friends with user with ID {}", userId, friendId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with ID " + userId + " is already friends with user with ID " + friendId);
         }
 
@@ -74,6 +80,9 @@ public class UserService {
         // Обновление пользователей в хранилище
         userStorage.updateUser(user);  // Явное обновление пользователя в хранилище
         userStorage.updateUser(friend); // Явное обновление друга в хранилище
+
+        // Логирование успешной операции
+        log.info("Successfully added friend with ID {} to user with ID {}", friendId, userId);
     }
 
     public void removeFriend(Integer userId, Integer friendId) {

@@ -6,6 +6,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import ru.yandex.practicum.filmorate.validator.ErrorResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,29 +14,34 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-  // Обработчик для ошибок валидации (400)
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException e) {
-    // Составляем список сообщений об ошибках для всех полей
+  public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
     List<String> errorMessages = e.getBindingResult().getFieldErrors().stream()
             .map(FieldError::getDefaultMessage)
             .collect(Collectors.toList());
-
-    // Возвращаем статус 400 (BAD REQUEST) и список ошибок
-    return new ResponseEntity<>("Ошибки валидации: " + String.join(", ", errorMessages), HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(
+            new ErrorResponse("Ошибки валидации: " + String.join(", ", errorMessages)),
+            HttpStatus.BAD_REQUEST
+    );
   }
 
-  // Обработчик для ресурса не найден (404)
   @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException e) {
-    // Возвращаем статус 404 (NOT FOUND) для случая, когда ресурс не найден
-    return new ResponseEntity<>("Ресурс не найден: " + e.getMessage(), HttpStatus.NOT_FOUND);
+  public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException e) {
+    return new ResponseEntity<>(new ErrorResponse("Ресурс не найден: " + e.getMessage()), HttpStatus.NOT_FOUND);
   }
 
-  // Обработчик для всех остальных исключений (500)
+  @ExceptionHandler(FilmNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleFilmNotFoundException(FilmNotFoundException e) {
+    return new ResponseEntity<>(new ErrorResponse("Фильм не найден: " + e.getMessage()), HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
+    return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+  }
+
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleException(Exception e) {
-    // Возвращаем статус 500 (INTERNAL SERVER ERROR) для всех других ошибок
-    return new ResponseEntity<>("Произошла ошибка: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+  public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    return new ResponseEntity<>(new ErrorResponse("Произошла ошибка: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

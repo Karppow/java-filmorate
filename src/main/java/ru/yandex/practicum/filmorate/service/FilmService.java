@@ -36,7 +36,7 @@ public class FilmService {
     public void addLike(Long filmId, Long userId) {
         Film film = filmStorage.getFilm(filmId);
         if (film == null) {
-            throw new FilmNotFoundException(filmId);
+            throw new FilmNotFoundException(filmId);  // Если фильм не найден
         }
 
         film.getLikes().add(userId);
@@ -56,5 +56,13 @@ public class FilmService {
                 .sorted(Comparator.comparingInt(f -> -f.getLikes().size()))
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    public Film getFilm(Long id) {
+        Film film = filmStorage.getFilm(id);
+        if (film == null) {
+            throw new FilmNotFoundException(id);
+        }
+        return film;
     }
 }

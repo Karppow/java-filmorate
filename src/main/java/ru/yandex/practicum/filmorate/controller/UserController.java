@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.validator.ErrorResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -42,18 +44,18 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+    public ResponseEntity<Object> updateUser(@Valid @RequestBody User user) {
         log.info("Updating user with ID: {}", user.getId());
 
-        User updatedUser = userService.updateUser(user);
-
-        // Если пользователь не найден, выбрасываем исключение
-        if (updatedUser == null) {
-            throw new UserNotFoundException(user.getId());
+        try {
+            User updatedUser = userService.updateUser(user);
+            log.info("User updated: {}", updatedUser);
+            return ResponseEntity.ok(updatedUser);
+        } catch (ResponseStatusException e) {
+            log.error("Error updating user: {}", e.getMessage(), e);
+            // Используйте ResponseEntity<Object> для гибкости в ответах
+            return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getReason()));
         }
-
-        log.info("User updated: {}", updatedUser);
-        return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping("/{id}")
@@ -81,7 +83,12 @@ public class UserController {
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addFriend(@PathVariable @Positive Integer id, @PathVariable @Positive Integer friendId) {
-        userService.addFriend(id, friendId);
+        try {
+            userService.addFriend(id, friendId);
+        } catch (ResponseStatusException e) {
+            log.error("Error occurred while adding friend: {}", e.getMessage());
+            throw e;  // Пробрасываем исключение дальше
+        }
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")

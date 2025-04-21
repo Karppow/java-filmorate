@@ -29,15 +29,12 @@ public class FilmController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
     }
 
-    @GetMapping
-    public ResponseEntity<Film> getFilm(@RequestBody Film film) {
-        if (film.getId() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
-        Film foundFilm = filmService.getFilm(film.getId());
+    // Используем @PathVariable для ID фильма
+    @GetMapping("/{id}")
+    public ResponseEntity<Film> getFilm(@PathVariable Long id) {
+        Film foundFilm = filmService.getFilm(id);
         if (foundFilm == null) {
-            throw new FilmNotFoundException(film.getId());
+            throw new FilmNotFoundException(id);
         }
         return ResponseEntity.ok(foundFilm);
     }
@@ -52,13 +49,10 @@ public class FilmController {
         return ResponseEntity.ok(updatedFilm);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteFilm(@RequestBody Film film) {
-        if (film.getId() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
-        filmService.deleteFilm(film.getId());
+    // Используем @PathVariable для ID фильма при удалении
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
+        filmService.deleteFilm(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

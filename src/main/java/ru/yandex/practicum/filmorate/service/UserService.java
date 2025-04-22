@@ -21,11 +21,11 @@ public class UserService {
     }
 
     public User addUser (User user) {
-        return userStorage.addUser (user);
+        return userStorage.addUser(user);
     }
 
     public User getUser (Integer id) {
-        User user = userStorage.getUser (id);
+        User user = userStorage.getUser(id);
         if (user == null) {
             throw new UserNotFoundException("Пользователь с ID " + id + " не найден");
         }
@@ -37,11 +37,11 @@ public class UserService {
     }
 
     public User updateUser (User user) {
-        User existingUser  = userStorage.getUser (user.getId());
+        User existingUser  = userStorage.getUser(user.getId());
         if (existingUser  == null) {
             throw new UserNotFoundException("Пользователь с ID " + user.getId() + " не найден");
         }
-        return userStorage.updateUser (user);
+        return userStorage.updateUser(user);
     }
 
     public void addFriend(Integer userId, Integer friendId) {
@@ -51,8 +51,8 @@ public class UserService {
         }
 
         // Получение пользователей из хранилища
-        User user = userStorage.getUser (userId);
-        User friend = userStorage.getUser (friendId);
+        User user = userStorage.getUser(userId);
+        User friend = userStorage.getUser(friendId);
 
         // Проверка существования пользователей
         if (user == null) {
@@ -75,16 +75,16 @@ public class UserService {
         friend.addFriend(userId);   // Добавляем ID пользователя в друзья друга
 
         // Обновление пользователей в хранилище
-        userStorage.updateUser (user);  // Явное обновление пользователя в хранилище
-        userStorage.updateUser (friend); // Явное обновление друга в хранилище
+        userStorage.updateUser(user);  // Явное обновление пользователя в хранилище
+        userStorage.updateUser(friend); // Явное обновление друга в хранилище
 
         // Логирование успешной операции
         log.info("Успешно добавлен друг с ID {} к пользователю с ID {}", friendId, userId);
     }
 
     public void removeFriend(Integer userId, Integer friendId) {
-        User user = userStorage.getUser (userId);
-        User friend = userStorage.getUser (friendId);
+        User user = userStorage.getUser(userId);
+        User friend = userStorage.getUser(friendId);
 
         if (user == null) {
             throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
@@ -101,14 +101,14 @@ public class UserService {
         user.removeFriend(friendId);
         friend.removeFriend(userId);
 
-        userStorage.updateUser (user);
-        userStorage.updateUser (friend);
+        userStorage.updateUser(user);
+        userStorage.updateUser(friend);
         log.info("Удален друг с ID {} у пользователя с ID {}", friendId, userId);
     }
 
     public Set<Integer> getCommonFriends(Integer userId1, Integer userId2) {
-        User user1 = userStorage.getUser (userId1);
-        User user2 = userStorage.getUser (userId2);
+        User user1 = userStorage.getUser(userId1);
+        User user2 = userStorage.getUser(userId2);
 
         // Проверка на существование пользователей
         if (user1 == null) {
@@ -124,7 +124,7 @@ public class UserService {
     }
 
     public Set<User> getFriends(Integer userId) {
-        User user = userStorage.getUser (userId);
+        User user = userStorage.getUser(userId);
         if (user == null) {
             throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
         }
@@ -137,7 +137,7 @@ public class UserService {
 
         Set<User> friends = new HashSet<>();
         for (Integer friendId : friendIds) {
-            User friend = userStorage.getUser (friendId);
+            User friend = userStorage.getUser(friendId);
             if (friend != null) {
                 friends.add(friend);
             } else {
@@ -157,7 +157,7 @@ public class UserService {
 
         // Преобразуем каждый ID друга в объект User
         for (Integer id : commonFriendIds) {
-            User user = userStorage.getUser (id);  // Получаем объект пользователя по ID
+            User user = userStorage.getUser(id);  // Получаем объект пользователя по ID
             if (user != null) {
                 commonFriends.add(user);
             }

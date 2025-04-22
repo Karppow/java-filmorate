@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser (@Valid @RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.info("Creating user: {}", user);
 
         // Проверка на дату рождения (будущая дата)
@@ -36,23 +36,23 @@ public class UserController {
             throw new FutureBirthdayException("Дата рождения не может быть в будущем."); // Обновлено
         }
 
-        User createdUser  = userService.addUser (user);
-        log.info("User  created with ID: {}", createdUser .getId());
+        User createdUser  = userService.addUser(user);
+        log.info("User  created with ID: {}", createdUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser );
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser (@Valid @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         log.info("Updating user with ID: {}", user.getId());
-        User updatedUser  = userService.updateUser (user);
-        log.info("User  updated: {}", updatedUser );
-        return ResponseEntity.ok(updatedUser );
+        User updatedUser  = userService.updateUser(user);
+        log.info("User  updated: {}", updatedUser);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser (@PathVariable @Positive Integer id) {
+    public ResponseEntity<User> getUser(@PathVariable @Positive Integer id) {
         log.info("Getting user with ID {}", id);
-        User user = userService.getUser (id);
+        User user = userService.getUser(id);
 
         if (user == null) {
             log.warn("User  with ID {} not found", id);
@@ -83,8 +83,8 @@ public class UserController {
         log.info("Removing friend with ID {} from user with ID {}", friendId, id);
 
         // Получаем пользователя и его друга
-        User user = userService.getUser (id);
-        User friend = userService.getUser (friendId);
+        User user = userService.getUser(id);
+        User friend = userService.getUser(friendId);
 
         // Проверяем, что оба пользователя существуют
         if (user == null) {

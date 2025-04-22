@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.validator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.Exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.GlobalExceptionHandler;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +21,7 @@ public class FilmValidatorTest {
     public void testFilmValidation_NameIsEmpty() {
         Film film = new Film();
         film.setName("");
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmValidator.validate(film));
+        GlobalExceptionHandler exception = assertThrows(GlobalExceptionHandler.class, () -> filmValidator.validate(film));
         assertEquals("Название фильма не должно быть пустым", exception.getMessage());
     }
 }

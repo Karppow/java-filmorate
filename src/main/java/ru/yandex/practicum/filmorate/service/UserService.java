@@ -20,11 +20,11 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public User addUser (User user) {
+    public User addUser(User user) {
         return userStorage.addUser(user);
     }
 
-    public User getUser (Integer id) {
+    public User getUser(Integer id) {
         User user = userStorage.getUser(id);
         if (user == null) {
             throw new UserNotFoundException("Пользователь с ID " + id + " не найден");
@@ -36,7 +36,7 @@ public class UserService {
         return userStorage.getUsers();
     }
 
-    public User updateUser (User user) {
+    public User updateUser(User user) {
         User existingUser  = userStorage.getUser(user.getId());
         if (existingUser  == null) {
             throw new UserNotFoundException("Пользователь с ID " + user.getId() + " не найден");
@@ -166,7 +166,7 @@ public class UserService {
     }
 
     public boolean userExists(Integer userId) {
-        return getUser (userId) != null; // Проверка на существование пользователя
+        return getUser(userId) != null; // Проверка на существование пользователя
     }
 }
 

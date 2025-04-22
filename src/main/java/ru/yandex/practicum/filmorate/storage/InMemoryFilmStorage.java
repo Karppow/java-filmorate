@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
@@ -16,6 +17,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
+        if (film == null) {
+            throw new ValidationException("Фильм не может быть null"); // Проверка на null
+        }
         film.setId(currentId++);
         films.put(film.getId(), film);
         return film;
@@ -23,6 +27,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
+        if (film == null) {
+            throw new ValidationException("Фильм не может быть null"); // Проверка на null
+        }
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             return film;
@@ -32,6 +39,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void deleteFilm(Integer id) {
+        if (!films.containsKey(id)) {
+            throw new FilmNotFoundException(id); // Если фильм не найден, выбрасываем исключение
+        }
         films.remove(id);
     }
 

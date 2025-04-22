@@ -23,28 +23,4 @@ public class Film {
 
     @Min(value = 1, message = "Длительность фильма должна быть больше нуля")
     private int duration;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Integer> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Set<Integer> likes) {
-        this.likes = likes;
-    }
 }

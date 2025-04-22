@@ -2,9 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.Exception.LikeAlreadyExistsException;
-import ru.yandex.practicum.filmorate.Exception.LikeNotFoundException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.LikeAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
@@ -56,31 +56,25 @@ public class FilmService {
     }
 
     public void addLike(Integer filmId, Integer userId) {
-        Film film = findFilmById(filmId);
-        if (film == null) {
-            throw new FilmNotFoundException(filmId); // 404 Not Found
-        }
+        Film film = findFilmById(filmId); // Найти фильм или выбросить исключение
 
         // Проверяем, ставил ли пользователь лайк ранее
-        if (!film.getLikes().contains(userId)) {
-            film.getLikes().add(userId); // Добавляем лайк
-        } else {
-            throw new LikeAlreadyExistsException(filmId, userId); // 400 Bad Request
+        if (film.getLikes().contains(userId)) {
+            throw new LikeAlreadyExistsException("Пользователь с ID " + userId + " уже поставил лайк фильму с ID " + filmId); // 400 Bad Request
         }
+        film.getLikes().add(userId); // Добавляем лайк
+        log.info("Пользователь с ID {} поставил лайк фильму с ID {}", userId, filmId);
     }
 
     public boolean removeLike(Integer filmId, Integer userId) {
-        Film film = findFilmById(filmId);
-        if (film == null) {
-            throw new FilmNotFoundException(filmId); // 404 Not Found
-        }
+        Film film = findFilmById(filmId); // Найти фильм или выбросить исключение
 
         // Проверяем, ставил ли пользователь лайк
-        if (film.getLikes().contains(userId)) {
-            film.getLikes().remove(userId); // Удаляем лайк
+        if (film.getLikes().remove(userId)) {
+            log.info("Пользователь с ID {} удалил лайк у фильма с ID {}", userId, filmId);
             return true; // Успешно удалено
         } else {
-            throw new LikeNotFoundException(userId, filmId); // 404 Not Found
+            throw new LikeNotFoundException("Пользователь с ID " + userId + " не ставил лайк фильму с ID " + filmId); // 404 Not Found
         }
     }
 

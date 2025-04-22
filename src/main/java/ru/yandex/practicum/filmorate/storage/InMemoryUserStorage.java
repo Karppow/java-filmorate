@@ -24,8 +24,7 @@ public class InMemoryUserStorage implements UserStorage {
             return null;
         }
 
-        // Обновляем пользователя в хранилище
-        users.put(user.getId(), user);
+        users.put(user.getId(), user); // Обновляем пользователя в хранилище
         return user;
     }
 

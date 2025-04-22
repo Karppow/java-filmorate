@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.validator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.Exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.GlobalExceptionHandler;
 import ru.yandex.practicum.filmorate.model.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +20,7 @@ public class UserValidatorTest {
     public void testUserValidationEmail() {
         User user = new User();
         user.setEmail("");
-        ValidationException exception = assertThrows(ValidationException.class, () -> userValidator.validate(user));
+        GlobalExceptionHandler exception = assertThrows(GlobalExceptionHandler.class, () -> userValidator.validate(user));
         assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exception.getMessage());
     }
 
@@ -29,7 +29,7 @@ public class UserValidatorTest {
         User user = new User();
         user.setLogin("");
         user.setEmail("test@example.com"); // добавьте электронную почту
-        ValidationException exception = assertThrows(ValidationException.class, () -> userValidator.validate(user));
+        GlobalExceptionHandler exception = assertThrows(GlobalExceptionHandler.class, () -> userValidator.validate(user));
         assertEquals("Логин не может быть пустым и содержать пробелы", exception.getMessage());
     }
 }

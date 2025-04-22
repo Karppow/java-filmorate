@@ -38,7 +38,7 @@ public class UserController {
 
         User createdUser  = userService.addUser(user);
         log.info("User  created with ID: {}", createdUser.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser );
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PutMapping

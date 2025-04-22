@@ -50,5 +50,4 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleFutureBirthdayException(FutureBirthdayException e) {
         return new ResponseEntity<>(new ErrorResponse("Ошибка: " + e.getMessage()), HttpStatus.BAD_REQUEST);
     }
-    
 }

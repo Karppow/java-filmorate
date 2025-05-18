@@ -145,9 +145,9 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         List<Integer> genreIds = new ArrayList<>(uniqueGenreIds);
-        jdbcTemplate.batchUpdate(sql, genreIds, genreIds.size(), (ps, i) -> {
+        jdbcTemplate.batchUpdate(sql, genreIds, genreIds.size(), (ps, genreId) -> {
             ps.setInt(1, filmId);
-            ps.setInt(2, genreIds.get(i));
+            ps.setInt(2, genreId);
         });
     }
 

@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface MpaStorage {
     Mpa getMpa(Integer id);
+
     List<Mpa> getAllMpa();
+
     boolean existsById(int id);
 }

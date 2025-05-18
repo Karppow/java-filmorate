@@ -32,15 +32,10 @@ public class FilmController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createFilm(@RequestBody Film film) {
-        try {
-            filmValidator.validate(film);
-            Film createdFilm = filmService.addFilm(film);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
-        } catch (ValidationException e) {
-            log.error("Ошибка валидации при создании фильма: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("errors", e.getMessage()));
-        }
+    public ResponseEntity<Film> createFilm(@RequestBody Film film) {
+        filmValidator.validate(film);
+        Film createdFilm = filmService.addFilm(film);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
     }
 
     @GetMapping

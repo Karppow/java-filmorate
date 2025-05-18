@@ -1,46 +1,46 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.List;
 
 @Repository
-public class DbMpaStorage implements MpaStorage {
+public class DbGenreStorage implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public DbMpaStorage(JdbcTemplate jdbcTemplate) {
+    public DbGenreStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public Mpa getMpa(Integer id) {
-        String sql = "SELECT * FROM mpa WHERE id = ?";
+    public Genre getGenre(Integer id) {
+        String sql = "SELECT * FROM genres WHERE id = ?";
         return jdbcTemplate.query(sql, rs -> {
             if (rs.next()) {
-                return new Mpa(rs.getInt("id"), rs.getString("name"));
+                return new Genre(rs.getInt("id"), rs.getString("name"));
             }
             return null;
         }, id);
     }
 
     @Override
-    public List<Mpa> getAllMpa() {
-        String sql = "SELECT * FROM mpa ORDER BY id";
+    public List<Genre> getAllGenres() {
+        String sql = "SELECT * FROM genres ORDER BY id";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
-                new Mpa(rs.getInt("id"), rs.getString("name")));
+                new Genre(rs.getInt("id"), rs.getString("name")));
     }
 
     @Override
     public boolean existsById(int id) {
-        String sql = "SELECT COUNT(*) FROM mpa WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM genres WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
     }
 }
-
 

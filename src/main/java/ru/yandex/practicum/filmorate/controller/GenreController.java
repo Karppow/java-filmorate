@@ -21,8 +21,12 @@ public class GenreController {
     }
 
     @GetMapping
-    public List<Genre> getAllGenres() {
-        return genreService.getAllGenres();
+    public ResponseEntity<List<Genre>> getAllGenres() {
+        List<Genre> genres = genreService.getAllGenres();
+        if (genres.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(genres);
     }
 
     @GetMapping("/{id}")

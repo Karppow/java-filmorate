@@ -62,4 +62,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGenreNotFoundException(GenreNotFoundException e) {
         return new ResponseEntity<>(new ErrorResponse("Ошибка: " + e.getMessage()), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<ErrorResponse> handleUnexpectedExceptions(Throwable e) {
+        return new ResponseEntity<>(
+                new ErrorResponse("Внутренняя ошибка сервера: " + e.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
 }

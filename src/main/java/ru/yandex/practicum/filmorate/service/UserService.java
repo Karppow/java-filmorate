@@ -4,9 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +23,7 @@ public class UserService {
     }
 
     public User addUser(User user) {
+        validateUser(user);
         return userStorage.addUser(user);
     }
 
@@ -37,49 +40,36 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-        User existingUser  = userStorage.getUser(user.getId());
-        if (existingUser  == null) {
+        validateUser(user);
+        User existingUser = userStorage.getUser(user.getId());
+        if (existingUser == null) {
             throw new UserNotFoundException("Пользователь с ID " + user.getId() + " не найден");
         }
         return userStorage.updateUser(user);
     }
 
-    public void addFriend(Integer userId, Integer friendId) {
-        // Проверка на добавление самого себя в друзья
-        if (userId.equals(friendId)) {
-            throw new IllegalArgumentException("Пользователь не может добавить себя в друзья");
+    public void addFriend(int userId, int friendId) {
+        if (userId == friendId) {
+            throw new ValidationException("Нельзя добавить себя в друзья");
         }
 
-        // Получение пользователей из хранилища
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
 
-        // Проверка существования пользователей
         if (user == null) {
-            log.error("Пользователь с ID {} не найден", userId);
             throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
         }
         if (friend == null) {
-            log.error("Друг с ID {} не найден", friendId);
-            throw new UserNotFoundException("Друг с ID " + friendId + " не найден");
+            throw new UserNotFoundException("Пользователь с ID " + friendId + " не найден");
         }
 
-        // Проверка, не является ли друг уже другом пользователя
-        if (user.getFriends().contains(friendId)) {
-            log.warn("Пользователь с ID {} уже является другом пользователя с ID {}", userId, friendId);
-            throw new IllegalArgumentException("Пользователь с ID " + userId + " уже является другом пользователя с ID " + friendId);
+        if (user.getFriends() != null && user.getFriends().contains(friendId)) {
+            log.info("Пользователь {} уже добавил друга {}", userId, friendId);
+            return;
         }
 
-        // Добавление друга
-        user.addFriend(friendId);  // Добавляем ID друга
-        friend.addFriend(userId);   // Добавляем ID пользователя в друзья друга
-
-        // Обновление пользователей в хранилище
-        userStorage.updateUser(user);  // Явное обновление пользователя в хранилище
-        userStorage.updateUser(friend); // Явное обновление друга в хранилище
-
-        // Логирование успешной операции
-        log.info("Успешно добавлен друг с ID {} к пользователю с ID {}", friendId, userId);
+        userStorage.addFriend(userId, friendId);
+        log.info("Пользователь {} добавил друга {}", userId, friendId);
     }
 
     public void removeFriend(Integer userId, Integer friendId) {
@@ -93,34 +83,12 @@ public class UserService {
             throw new UserNotFoundException("Друг с ID " + friendId + " не найден");
         }
 
-        // Изменяем код ошибки с 400 на 404
-        if (!user.getFriends().contains(friendId)) {
-            throw new UserNotFoundException("Пользователь с ID " + userId + " не является другом пользователя с ID " + friendId);
-        }
-
-        user.removeFriend(friendId);
-        friend.removeFriend(userId);
-
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
-        log.info("Удален друг с ID {} у пользователя с ID {}", friendId, userId);
+        userStorage.removeFriend(userId, friendId);
+        log.info("Пользователь {} удалил друга {}", userId, friendId);
     }
 
-    public Set<Integer> getCommonFriends(Integer userId1, Integer userId2) {
-        User user1 = userStorage.getUser(userId1);
-        User user2 = userStorage.getUser(userId2);
-
-        // Проверка на существование пользователей
-        if (user1 == null) {
-            throw new UserNotFoundException("Пользователь с ID " + userId1 + " не найден");
-        }
-        if (user2 == null) {
-            throw new UserNotFoundException("Пользователь с ID " + userId2 + " не найден");
-        }
-
-        Set<Integer> commonFriends = new HashSet<>(user1.getFriends());
-        commonFriends.retainAll(user2.getFriends());  // Получаем пересечение друзей
-        return commonFriends;
+    public Set<Integer> getCommonFriendIds(Integer userId1, Integer userId2) {
+        return new HashSet<>(userStorage.getCommonFriends(userId1, userId2));
     }
 
     public Set<User> getFriends(Integer userId) {
@@ -131,42 +99,37 @@ public class UserService {
 
         Set<Integer> friendIds = user.getFriends();
         if (friendIds == null || friendIds.isEmpty()) {
-            log.warn("Пользователь с ID {} не имеет друзей.", userId);
-            return new HashSet<>(); // Возвращаем пустой набор, если друзей нет
+            return Collections.emptySet();
         }
 
-        Set<User> friends = new HashSet<>();
-        for (Integer friendId : friendIds) {
-            User friend = userStorage.getUser(friendId);
-            if (friend != null) {
-                friends.add(friend);
-            } else {
-                log.warn("Друг с ID {} не найден для пользователя с ID {}", friendId, userId);
-            }
-        }
-
-        log.info("Найдено {} друзей для пользователя с ID {}", friends.size(), userId);
-        return friends;
+        return userStorage.getUsersByIds(friendIds);
     }
 
     public Set<User> getCommonFriendsAsUsers(Integer userId1, Integer userId2) {
-        // Получаем общие ID друзей
-        Set<Integer> commonFriendIds = getCommonFriends(userId1, userId2);
-
-        Set<User> commonFriends = new HashSet<>();
-
-        // Преобразуем каждый ID друга в объект User
-        for (Integer id : commonFriendIds) {
-            User user = userStorage.getUser(id);  // Получаем объект пользователя по ID
-            if (user != null) {
-                commonFriends.add(user);
-            }
+        Set<Integer> commonFriendIds = new HashSet<>(userStorage.getCommonFriends(userId1, userId2));
+        if (commonFriendIds.isEmpty()) {
+            return Collections.emptySet();
         }
-        return commonFriends;
+        return userStorage.getUsersByIds(commonFriendIds);
     }
 
     public boolean userExists(Integer userId) {
-        return getUser(userId) != null; // Проверка на существование пользователя
+        return userStorage.userExists(userId);
+    }
+
+    private void validateUser(User user) {
+        if (user.getLogin() == null || user.getLogin().isBlank()) {
+            throw new ValidationException("Логин не может быть пустым");
+        }
+        if (user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин не может содержать пробелы");
+        }
+        if (user.getEmail() == null || !user.getEmail().contains("@")) {
+            throw new ValidationException("Некорректный email");
+        }
+        if (user.getBirthday() != null && user.getBirthday().isAfter(java.time.LocalDate.now())) {
+            throw new ValidationException("Дата рождения не может быть в будущем");
+        }
     }
 }
 

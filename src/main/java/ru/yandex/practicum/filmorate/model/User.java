@@ -6,8 +6,6 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,34 +15,31 @@ public class User {
     private Integer id;
     private String name;
 
-    @JsonProperty(defaultValue = "[]")
-    private Set<Integer> friends = new HashSet<>(); // Инициализация сразу
+    private Set<Integer> friends = new HashSet<>();
 
+    @NotBlank
     @Email(message = "Некорректный формат адреса электронной почты")
     private String email;
 
     @NotBlank(message = "Логин не может быть пустым и не должен содержать пробелы")
-    @Pattern(regexp = "^[A-Za-z0-9\\s]+$", message = "Логин может содержать только буквы, цифры и пробелы")
+    @Pattern(regexp = "^[A-Za-z0-9]+$", message = "Логин может содержать только буквы и цифры")
     private String login;
 
     @PastOrPresent(message = "Дата рождения должна быть сегодняшней или прошедшей")
     private LocalDate birthday;
 
-    // Конструктор с инициализацией friends
-    public User() {
-        this.friends = new HashSet<>(); // Инициализация friends сразу
-    }
-
-    public Set<Integer> getFriends() {
-        return friends; // friends всегда инициализирован
-    }
-
     public void addFriend(Integer friendId) {
-        this.friends.add(friendId); // friends уже инициализирован
+        if (friendId != null && !friendId.equals(this.id)) {
+            friends.add(friendId);
+        }
     }
 
     public void removeFriend(Integer friendId) {
-        this.friends.remove(friendId);
+        friends.remove(friendId);
+    }
+
+    @Override
+    public String toString() {
+        return "User{id=" + id + ", name='" + name + "', friends=" + friends + "}";
     }
 }
-

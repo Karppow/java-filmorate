@@ -4,7 +4,9 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -22,5 +24,10 @@ public class Film {
     private LocalDate releaseDate;
 
     @Min(value = 1, message = "Длительность фильма должна быть больше нуля")
-    private int duration;
+    private Integer duration;
+
+    private List<Genre> genres = new ArrayList<>(); // добавляем жанры
+
+    private Mpa mpa;
 }
+

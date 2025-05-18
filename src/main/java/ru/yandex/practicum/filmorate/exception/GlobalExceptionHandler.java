@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -49,5 +50,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FutureBirthdayException.class)
     public ResponseEntity<ErrorResponse> handleFutureBirthdayException(FutureBirthdayException e) {
         return new ResponseEntity<>(new ErrorResponse("Ошибка: " + e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MpaNotFoundException.class)
+    public ResponseEntity<Object> handleMpaNotFoundException(MpaNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("errors", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GenreNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleGenreNotFoundException(GenreNotFoundException e) {
+        return new ResponseEntity<>(new ErrorResponse("Ошибка: " + e.getMessage()), HttpStatus.NOT_FOUND);
     }
 }

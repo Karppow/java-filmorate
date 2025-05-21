@@ -5,23 +5,39 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.LikeAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
+import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class FilmService {
     private final InMemoryFilmStorage filmStorage;
+    private final MpaStorage mpaStorage;
+    private final GenreStorage genreStorage;
 
-    public FilmService(InMemoryFilmStorage filmStorage) {
+    public FilmService(InMemoryFilmStorage filmStorage, MpaStorage mpaStorage, GenreStorage genreStorage) {
         this.filmStorage = filmStorage;
+        this.mpaStorage = mpaStorage;
+        this.genreStorage = genreStorage;
     }
 
     public Film addFilm(Film film) {
+        // Проверяем, что mpa_id существует
+        Integer mpaId = film.getMpa().getId();
+        if (!mpaStorage.existsById(mpaId)) {
+            throw new MpaNotFoundException("MPA с ID " + mpaId + " не существует");
+        }
         return filmStorage.addFilm(film);
     }
 
@@ -34,16 +50,28 @@ public class FilmService {
     }
 
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        List<Film> films = filmStorage.getAllFilms();
+        for (Film film : films) {
+            film.setMpa(mpaStorage.getMpa(film.getMpa().getId()));
+            Set<Genre> fullGenres = film.getGenres().stream()
+                    .map(g -> genreStorage.getGenre(g.getId()))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            film.setGenres(new ArrayList<>(fullGenres));
+        }
+        return films;
     }
 
     private Film findFilmById(Integer filmId) {
         Film film = filmStorage.getFilm(filmId);
         if (film == null) {
-            log.error("Фильм с ID {} не найден", filmId);
-            throw new FilmNotFoundException(filmId); // Бросаем исключение, если фильм не найден
+            throw new FilmNotFoundException(filmId);
         }
-        return film; // Возвращаем фильм, если он найден
+        film.setMpa(mpaStorage.getMpa(film.getMpa().getId()));
+        Set<Genre> fullGenres = film.getGenres().stream()
+                .map(g -> genreStorage.getGenre(g.getId()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        film.setGenres(new ArrayList<>(fullGenres));
+        return film;
     }
 
     public boolean filmExists(Integer filmId) {
@@ -87,6 +115,6 @@ public class FilmService {
     }
 
     public Film getFilm(Integer id) {
-        return findFilmById(id); // Теперь метод findFilmById выбросит исключение, если фильм не найден
+        return findFilmById(id);
     }
 }
